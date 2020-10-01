@@ -10,7 +10,7 @@ note
 	revision: "$Revision: 1098 $"
 
 class
-	LINKED_GRAPH [G -> HASHABLE, L]
+	LINKED_GRAPH [G -> HASHABLE, reference L]
 
 inherit
 	GRAPH [G, L]
@@ -75,7 +75,6 @@ feature -- Access
 			end
 		end
 
-	--edges: LIST [EDGE [G, L]]
 	edges: LIST [like edge_item]
 			-- All edges of the graph
 		do
@@ -88,7 +87,7 @@ feature -- Access
 			Result := current_node.item
 		end
 
-	edge_item: detachable LINKED_GRAPH_EDGE [like item, L]
+	edge_item: LINKED_GRAPH_EDGE [like item, L]
 			-- Current edge
 		do
 			if not current_node.edge_list.off then
@@ -101,78 +100,73 @@ feature -- Access
 	incident_edges: LIST [like edge_item]
 			-- All incident edges of `item'
 		local
-			--edge_list: TWO_WAY_CIRCULAR [like edge_item]
+			edge_list: TWO_WAY_CIRCULAR [like edge_item]
 			index: INTEGER
 		do
 			create {ARRAYED_LIST [like edge_item]} Result.make (out_degree)
 
 			-- Backup current cursor.
 			index := current_node.edge_list.index
-			if attached {TWO_WAY_CIRCULAR [like edge_item]} current_node.edge_list as edge_list then
-				from
-					edge_list.start
-				until
-					edge_list.exhausted
-				loop
-					Result.extend (edge_list.item)
-					edge_list.forth
-				end
 
-				-- Restore old cursor.
-				if edge_list.valid_index (index) then
-					edge_list.go_i_th (index)
-				end
+			from
+				edge_list := current_node.edge_list
+				edge_list.start
+			until
+				edge_list.exhausted
+			loop
+				Result.extend (edge_list.item)
+				edge_list.forth
+			end
+
+			-- Restore old cursor.
+			if edge_list.valid_index (index) then
+				edge_list.go_i_th (index)
 			end
 		end
 
 	incident_edge_labels: LIST [L]
 			-- Labels of all incident edges of `item'
 		local
-	--		edge_list: TWO_WAY_CIRCULAR [like edge_item]
+			edge_list: TWO_WAY_CIRCULAR [like edge_item]
 			index: INTEGER
 		do
 			create {ARRAYED_LIST [L]} Result.make (out_degree)
 
 			-- Backup current cursor.
 			index := current_node.edge_list.index
-			if attached  {TWO_WAY_CIRCULAR [like edge_item]} current_node.edge_list as edge_list then
-				from
-					edge_list.start
-				until
-					edge_list.exhausted
-				loop
-					if attached edge_list.item.label as label then
-						Result.extend (label)
-					end
-					edge_list.forth
-				end
 
-				-- Restore old cursor.
-				if edge_list.valid_index (index) then
-					edge_list.go_i_th (index)
-				end
+			from
+				edge_list := current_node.edge_list
+				edge_list.start
+			until
+				edge_list.exhausted
+			loop
+				Result.extend (edge_list.item.label)
+				edge_list.forth
+			end
+
+			-- Restore old cursor.
+			if edge_list.valid_index (index) then
+				edge_list.go_i_th (index)
 			end
 		end
 
-	edge_from_values (a_start_node, a_end_node: like item; a_label: L): detachable EDGE [like item,L]
+	edge_from_values (a_start_node, a_end_node: like item; a_label: L): like edge_item
 			-- Edge that matches `a_start_node', `a_end_node' and `a_label'.
 			-- Result is Void if there is no match.
 			-- The cursor is not moved.
 		local
 			start_node, end_node: like current_node
-			--edge: like edge_item
-			edge: LINKED_GRAPH_EDGE [like item, L]
+			edge: like edge_item
 		do
 			if has_node (a_start_node) and has_node (a_end_node) then
 				start_node := linked_node_from_item (a_start_node)
 				end_node := linked_node_from_item (a_end_node)
-				if attached start_node and then attached end_node then
-					create edge.make_directed (start_node, end_node, a_label)
-					if has_edge (edge) then
-						Result := edge
-					else
-						Result := Void
-					end
+				create edge.make_directed (start_node, end_node, a_label)
+				if has_edge (edge) then
+					Result := edge
+				else
+					Result := Void
 				end
 			end
 		end
@@ -240,7 +234,6 @@ feature -- Status report
 		end
 
 	has_edge (a_edge: EDGE [like item, L]): BOOLEAN
-	--has_edge (a_edge: attached like edge_item): BOOLEAN
 			-- Is `a_edge' part of the graph?
 		local
 			linked_graph_edge: like edge_item
@@ -275,30 +268,29 @@ feature -- Status report
 		local
 			index: INTEGER
 			start_node, end_node: like current_node
-	--		el: TWO_WAY_CIRCULAR [like edge_item]
+			el: TWO_WAY_CIRCULAR [like edge_item]
 		do
 			start_node := linked_node_from_item (a_start_node)
 			end_node := linked_node_from_item (a_end_node)
-			if attached { TWO_WAY_CIRCULAR [like edge_item]} start_node.edge_list as el then
+			el := start_node.edge_list
 
-				-- Make backup of cursor.
-				index := el.index
+			-- Make backup of cursor.
+			index := el.index
 
-				from
-					el.start
-				until
-					Result or el.exhausted
-				loop
-					if el.item.internal_end_node = end_node then
-						Result := True
-					end
-					el.forth
+			from
+				el.start
+			until
+				Result or el.exhausted
+			loop
+				if el.item.internal_end_node = end_node then
+					Result := True
 				end
+				el.forth
+			end
 
-				-- Restore cursor.
-				if el.valid_index (index) then
-					el.go_i_th (index)
-				end
+			-- Restore cursor.
+			if el.valid_index (index) then
+				el.go_i_th (index)
 			end
 		end
 
@@ -431,7 +423,7 @@ feature -- Element change
 			end
 		end
 
-	put_edge (a_start_node, a_end_node: like item; a_label: detachable L)
+	put_edge (a_start_node, a_end_node: like item; a_label: L)
 			-- Create an edge between `a_start_node' and `a_end_node'
 			-- and set its label to `a_label'.
 			-- For symmetric graphs, another edge is inserted in the opposite direction.
@@ -442,15 +434,13 @@ feature -- Element change
 		do
 			start_node := linked_node_from_item (a_start_node)
 			end_node := linked_node_from_item (a_end_node)
-			if attached start_node and then attached end_node then
-				create edge.make_directed (start_node, end_node, a_label)
-				start_node.put_edge (edge)
+			create edge.make_directed (start_node, end_node, a_label)
+			start_node.put_edge (edge)
+			internal_edges.extend (edge)
+			if is_symmetric_graph and start_node /= end_node then
+				create edge.make_directed (end_node, start_node, a_label)
+				end_node.put_edge (edge)
 				internal_edges.extend (edge)
-				if is_symmetric_graph and start_node /= end_node then
-					create edge.make_directed (end_node, start_node, a_label)
-					end_node.put_edge (edge)
-					internal_edges.extend (edge)
-				end
 			end
 		end
 
@@ -462,9 +452,8 @@ feature -- Removal
 			-- The cursor will turn right if `target' is removed.
 		local
 			index: INTEGER
---			edge: like edge_item
---			dangling_edges: LINEAR [LINKED_GRAPH_EDGE [like item, L]]
---			dangling_edges: LINEAR [like edge_item]
+			edge: like edge_item
+			dangling_edges: LINEAR [like edge_item]
 		do
 			-- Graph becomes `off' when current node is removed.
 			if (not off) and equal (item, a_item) then
@@ -488,23 +477,21 @@ feature -- Removal
 				index_of_element.remove (a_item)
 
 				-- Remove all incident edges of `a_item'.
-				if attached {LINEAR [like edge_item]} internal_edges.linear_representation as dangling_edges then
-					from
-						dangling_edges.start
-					until
-						dangling_edges.after
-					loop
-						if attached {like edge_item} dangling_edges.item as edge then
-							if edge.start_node.is_equal (a_item) then
-								-- Remove edge starting in `a_item'.
-								internal_edges.prune (edge)
-							elseif edge.end_node.is_equal (a_item) then
-								-- Remove edge ending in `a_item'.
-								prune_edge_impl (edge)
-							else
-								dangling_edges.forth
-							end
-						end
+				from
+					dangling_edges := internal_edges.linear_representation
+					dangling_edges.start
+				until
+					dangling_edges.after
+				loop
+					edge := dangling_edges.item
+					if edge.start_node.is_equal (a_item) then
+						-- Remove edge starting in `a_item'.
+						internal_edges.prune (edge)
+					elseif edge.end_node.is_equal (a_item) then
+						-- Remove edge ending in `a_item'.
+						prune_edge_impl (edge)
+					else
+						dangling_edges.forth
 					end
 				end
 
@@ -516,8 +503,7 @@ feature -- Removal
 	prune_edge (a_edge: EDGE [like item, L])
 			-- Remove `a_edge' from the graph.
 		local
-			linked_edge: like edge_item
-			symmetric_edge: LINKED_GRAPH_EDGE [like item, L]
+			linked_edge, symmetric_edge: like edge_item
 			start_node, end_node: like current_node
 		do
 			prune_edge_impl (a_edge)
@@ -531,10 +517,8 @@ feature -- Removal
 					start_node := linked_node_from_item (a_edge.start_node)
 					end_node := linked_node_from_item (a_edge.end_node)
 				end
-				if attached end_node and then attached start_node then
-					create symmetric_edge.make_directed (end_node, start_node, a_edge.label)
-					prune_edge_impl (symmetric_edge)
-				end
+				create symmetric_edge.make_directed (end_node, start_node, a_edge.label)
+				prune_edge_impl (symmetric_edge)
 			end
 		end
 
@@ -587,6 +571,7 @@ feature -- Output
 			node: like current_node
 			edge: like edge_item
 			index: INTEGER
+			label: L
 		do
 			Result := "digraph linked_graph%N"
 			Result.append ("{%N")
@@ -615,7 +600,8 @@ feature -- Output
 						edge := node.edge_list.item
 						Result.append (edge.end_node.out)
 						Result.append ("%"")
-						if attached {ANY} edge.label as label and then label /= Void and then not label.out.is_equal ("") then
+						label := edge.label
+						if label /= Void and then not label.out.is_equal ("") then
 							Result.append (" [label=%"")
 							Result.append (label.out)
 							Result.append ("%"]")
@@ -640,10 +626,10 @@ feature {NONE} -- Implementation
 	inactive_nodes: ARRAYED_SET [INTEGER]
 			-- Indices which are currently not in use.
 
-	current_node: detachable LINKED_GRAPH_NODE [like item, L]
+	current_node: LINKED_GRAPH_NODE [like item, L]
 			-- Current node in the list
 
-	internal_edges: ARRAYED_LIST [ like edge_item]
+	internal_edges: ARRAYED_LIST [like edge_item]
 			-- Set of all edges of the graph
 
 	empty_graph: like Current
@@ -691,14 +677,11 @@ feature {NONE} -- Implementation
 		require
 			edge_exists: has_edge (a_edge)
 		local
-			--linked_edge: like edge_item
-			linked_edge: LINKED_GRAPH_EDGE [like item, L]
+			linked_edge: like edge_item
 			start_node, end_node: like current_node
 			c: like cursor
 		do
-			if attached  {like edge_item} a_edge as l_edge then
-				linked_edge := l_edge
-			end
+			linked_edge ?= a_edge
 
 			-- Find both start and end node in the node list.
 			if linked_edge /= Void then
@@ -707,13 +690,11 @@ feature {NONE} -- Implementation
 			else
 				start_node := linked_node_from_item (a_edge.start_node)
 				end_node := linked_node_from_item (a_edge.end_node)
-				if attached start_node and  then attached end_node then
-					create {LINKED_GRAPH_EDGE [like item, L]} linked_edge.make_directed (start_node, end_node, a_edge.label)
-				end
+				create linked_edge.make_directed (start_node, end_node, a_edge.label)
 			end
 
 			-- Turn cursor if `edge_item' is removed.
-			if (not off) and then attached edge_item as l_edge_item and then linked_edge.is_equal (l_edge_item) then
+			if (not off) and then linked_edge.is_equal (edge_item) then
 				right
 			end
 
@@ -727,9 +708,9 @@ feature {NONE} -- Implementation
 			turn_to_edge (a_edge)
 			current_node.edge_list.remove
 
-			if attached {like edge_item} linked_edge as l_linked_edge and then attached {ARRAYED_LIST [ like edge_item]} internal_edges as l_internal_edges and then l_internal_edges.has (l_linked_edge) then
-				l_internal_edges.start
-				l_internal_edges.prune (l_linked_edge)
+			if internal_edges.has (linked_edge) then
+				internal_edges.start
+				internal_edges.prune (linked_edge)
 			end
 
 			-- Restore cursor.

@@ -11,7 +11,7 @@ note
 	revision: "$Revision: 1133 $"
 
 class
-	LINKED_WEIGHTED_GRAPH [G -> HASHABLE, L]
+	LINKED_WEIGHTED_GRAPH [G -> HASHABLE, reference L]
 
 inherit
 	LINKED_GRAPH [G, L]
@@ -63,7 +63,7 @@ create
 
 feature -- Access
 
-	edge_item: detachable LINKED_GRAPH_WEIGHTED_EDGE [like item, L]
+	edge_item: LINKED_GRAPH_WEIGHTED_EDGE [like item, L]
 			-- Current edge
 		do
 			if not current_node.edge_list.off then
@@ -84,13 +84,12 @@ feature -- Access
 			if has_node (a_start_node) and has_node (a_end_node) then
 				start_node := linked_node_from_item (a_start_node)
 				end_node := linked_node_from_item (a_end_node)
-				if attached start_node and then attached end_node then
-					create edge.make_directed (start_node, end_node, a_label, a_weight)
-					if has_edge (edge) then
-						Result := edge
-					else
-						Result := Void
-					end
+				create edge.make_directed (start_node, end_node, a_label, a_weight)
+
+				if has_edge (edge) then
+					Result := edge
+				else
+					Result := Void
 				end
 			end
 		end
@@ -115,15 +114,13 @@ feature -- Element change
 		do
 			start_node := linked_node_from_item (a_start_node)
 			end_node := linked_node_from_item (a_end_node)
-			if attached start_node and then attached end_node then
-				create edge.make_directed (start_node, end_node, a_label, a_weight)
-				start_node.put_edge (edge)
+			create edge.make_directed (start_node, end_node, a_label, a_weight)
+			start_node.put_edge (edge)
+			internal_edges.extend (edge)
+			if is_symmetric_graph and start_node /= end_node then
+				create edge.make_directed (end_node, start_node, a_label, a_weight)
+				end_node.put_edge (edge)
 				internal_edges.extend (edge)
-				if is_symmetric_graph and start_node /= end_node then
-					create edge.make_directed (end_node, start_node, a_label, a_weight)
-					end_node.put_edge (edge)
-					internal_edges.extend (edge)
-				end
 			end
 		end
 
@@ -147,12 +144,13 @@ feature -- Inapplicable
 
 feature -- Output
 
-	out: STRING
+	out: STRING 
 			-- Printable representation of the graph
 		local
 			node: like current_node
 			edge: like edge_item
 			i, index: INTEGER
+			label: L
 		do
 			Result := "digraph linked_weighted_graph%N"
 			Result.append ("{%N")
@@ -178,8 +176,8 @@ feature -- Output
 					edge ?= node.edge_list.item
 					Result.append (edge.end_node.out)
 					Result.append ("%" [label=%"")
-
-					if attached {ANY} edge.label as label and then label /= Void and then not label.out.is_equal ("") then
+					label := edge.label
+					if label /= Void and then not label.out.is_equal ("") then
 						Result.append (label.out)
 						Result.append ("\n")
 					end

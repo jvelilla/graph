@@ -9,7 +9,7 @@ note
 	revision: "$Revision: 1086 $"
 
 class
-	LINKED_UNDIRECTED_GRAPH [G -> HASHABLE, L]
+	LINKED_UNDIRECTED_GRAPH [G -> HASHABLE, reference L]
 
 inherit
 	LINKED_GRAPH [G, L]
@@ -75,29 +75,28 @@ feature -- Status report
 		local
 			index: INTEGER
 			start_node: like current_node
---			el: TWO_WAY_CIRCULAR [like edge_item]
+			el: TWO_WAY_CIRCULAR [like edge_item]
 		do
 			start_node := linked_node_from_item (a_start_node)
-			if attached {TWO_WAY_CIRCULAR [like edge_item]} start_node.edge_list as el  then
+			el := start_node.edge_list
 
-				-- Make backup of cursor.
-				index := el.index
+			-- Make backup of cursor.
+			index := el.index
 
-				from
-					el.start
-				until
-					Result or el.exhausted
-				loop
-					if el.item.opposite_node (a_start_node).is_equal (a_end_node) then
-						Result := True
-					end
-					el.forth
+			from
+				el.start
+			until
+				Result or el.exhausted
+			loop
+				if el.item.opposite_node (a_start_node).is_equal (a_end_node) then
+					Result := True
 				end
+				el.forth
+			end
 
-				-- Restore cursor.
-				if el.valid_index (index) then
-					el.go_i_th (index)
-				end
+			-- Restore cursor.
+			if el.valid_index (index) then
+				el.go_i_th (index)
 			end
 		end
 
@@ -107,7 +106,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: like item; a_label: detachable L)
+	put_edge (a_start_node, a_end_node: like item; a_label: L)
 			-- Create an edge between `a_start_node' and `a_end_node'
 			-- and set its label to `a_label'.
 			-- The cursor is not moved.
@@ -117,23 +116,19 @@ feature -- Element change
 		do
 			start_node := linked_node_from_item (a_start_node)
 			end_node := linked_node_from_item (a_end_node)
-			if attached start_node and then attached end_node then
-				create edge.make_undirected (start_node, end_node, a_label)
-				start_node.put_edge (edge)
-				end_node.put_edge (edge)
-				internal_edges.extend (edge)
-			end
+			create edge.make_undirected (start_node, end_node, a_label)
+			start_node.put_edge (edge)
+			end_node.put_edge (edge)
+			internal_edges.extend (edge)
 		end
 
 feature -- Removal
 
 	prune_edge (a_edge: EDGE [like item, L])
-	--prune_edge (a_edge: like edge_item)
 			-- Remove `a_edge' from the graph.
 			-- The cursor will turn right if `current_egde' is removed.
 		local
-			--linked_edge:  like edge_item
-			linked_edge: LINKED_GRAPH_EDGE [like item, L]
+			linked_edge: like edge_item
 			start_node, end_node: like current_node
 			c: like cursor
 			index: INTEGER
@@ -147,13 +142,11 @@ feature -- Removal
 			else
 				start_node := linked_node_from_item (a_edge.start_node)
 				end_node := linked_node_from_item (a_edge.end_node)
-				if attached start_node and then attached end_node then
-					create linked_edge.make_directed (start_node, end_node, a_edge.label)
-				end
+				create linked_edge.make_directed (start_node, end_node, a_edge.label)
 			end
 
 			-- Turn cursor if `edge_item' is removed.
-			if (not off) and then attached edge_item as l_edge_item and then linked_edge.is_equal (l_edge_item) then
+			if (not off) and then linked_edge.is_equal (edge_item) then
 				right
 			end
 
@@ -182,10 +175,7 @@ feature -- Removal
 			end
 
 			internal_edges.start
-			if attached {like edge_item} linked_edge as l_linked_edge and then attached {ARRAYED_LIST [like edge_item]} internal_edges as l_internal_edges and then l_internal_edges.has (l_linked_edge) then
-				l_internal_edges.start
-				l_internal_edges.prune (l_linked_edge)
-			end
+			internal_edges.prune (linked_edge)
 
 			-- Restore cursor.
 			if c /= Void then
@@ -220,6 +210,7 @@ feature -- Output
 			node: like current_node
 			edge: like edge_item
 			edges_todo: like edges
+			label: ANY
 		do
 			Result := "graph linked_undirected_graph%N"
 			Result.append ("{%N")
@@ -249,8 +240,8 @@ feature -- Output
 						Result.append ("%" -- %"")
 						Result.append (edge.opposite_node (node.item).out)
 						Result.append ("%"")
-
-						if attached {ANY} node.edge_list.item.label as label and then label /= Void and then not label.out.is_equal ("") then
+						label := node.edge_list.item.label
+						if label /= Void and then not label.out.is_equal ("") then
 							Result.append (" [label=%"")
 							Result.append (label.out)
 							Result.append ("%"]")

@@ -11,7 +11,7 @@ note
 	revision: "$Revision: 1134 $"
 
 deferred class
-	ABSTRACT_FS_WALKER [G -> HASHABLE, L]
+	ABSTRACT_FS_WALKER [G -> HASHABLE, reference L]
 
 inherit
 	LINEAR [G]
@@ -60,7 +60,7 @@ feature -- Status report
 
 feature -- Cursor movement
 
-	start
+	start 
 			-- Move the cursor back to the start
 		do
 			graph.go_to (first_node)

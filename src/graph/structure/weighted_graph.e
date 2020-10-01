@@ -10,7 +10,7 @@ note
 	revision: "$Revision: 1133 $"
 
 deferred class
-	WEIGHTED_GRAPH [G -> HASHABLE, L]
+	WEIGHTED_GRAPH [G -> HASHABLE, reference L]
 
 inherit
 	GRAPH [G, L]
@@ -28,7 +28,7 @@ inherit
 
 feature -- Access
 
-	edge_item: detachable WEIGHTED_EDGE [like item, L]
+	edge_item: WEIGHTED_EDGE [like item, L]
 			-- Current edge
 		deferred
 		end
@@ -40,7 +40,7 @@ feature -- Access
 		deferred
 		end
 
-	shortest_path: like path
+	shortest_path: like path 
 			-- Shortest path, that has been found with `find_shortest_path'
 		require
 			path_found: path_found
@@ -55,17 +55,18 @@ feature -- Measurement
 
 	weight_sum: REAL_64
 			-- Sum of all edge weights of the graph
+		local
+			lin_rep: LINEAR [like edge_item]
 		do
 			Result := 0
-			if attached {LINEAR [like edge_item]} edges.linear_representation as lin_rep then
-				from
-					lin_rep.start
-				until
-					lin_rep.after
-				loop
-					Result := Result + lin_rep.item.weight
-					lin_rep.forth
-				end
+			from
+				lin_rep := edges.linear_representation
+				lin_rep.start
+			until
+				lin_rep.after
+			loop
+				Result := Result + lin_rep.item.weight
+				lin_rep.forth
 			end
 		ensure
 			cursor_not_moved: equal (cursor, old cursor)
@@ -75,29 +76,30 @@ feature -- Status report
 
 	all_weights_positive: BOOLEAN
 			-- Are all edge weights positive?
+		local
+			lin_rep: LINEAR [like edge_item]
 		do
 			Result := True
-			if attached {LINEAR [like edge_item]} edges.linear_representation as  lin_rep then
-				from
-					lin_rep.start
-				until
-					not Result or lin_rep.after
-				loop
-					if lin_rep.item.weight < 0 then
-						Result := False
-					end
-					lin_rep.forth
+			from
+				lin_rep := edges.linear_representation
+				lin_rep.start
+			until
+				not Result or lin_rep.after
+			loop
+				if lin_rep.item.weight < 0 then
+					Result := False
 				end
+				lin_rep.forth
 			end
 		end
 
 feature -- Status setting
 
-	enable_user_defined_weight_function (a_function: FUNCTION [TUPLE [WEIGHTED_EDGE [G, L]], REAL_64])
+	enable_user_defined_weight_function (a_function: FUNCTION [ANY, TUPLE [WEIGHTED_EDGE [G, L]], REAL_64])
 			-- Use `a_function' to compute edge weight instead of stored value.
 		local
 			edge_list: like edges
-			--edge: like edge_item
+			edge: like edge_item
 		do
 			from
 				edge_list := edges
@@ -105,9 +107,8 @@ feature -- Status setting
 			until
 				edge_list.after
 			loop
-				if attached {like edge_item} edge_list.item as edge then
-					edge.enable_user_defined_weight_function (a_function)
-				end
+				edge := edge_list.item
+				edge.enable_user_defined_weight_function (a_function)
 				edge_list.forth
 			end
 		end
@@ -116,7 +117,7 @@ feature -- Status setting
 			-- Revert to stored edge weights.
 		local
 			edge_list: like edges
---			edge: like edge_item
+			edge: like edge_item
 		do
 			from
 				edge_list := edges
@@ -124,9 +125,8 @@ feature -- Status setting
 			until
 				edge_list.after
 			loop
-				if attached {like edge_item} edge_list.item as edge then
-					edge.restore_default_weight
-				end
+				edge := edge_list.item
+				edge.restore_default_weight
 				edge_list.forth
 			end
 		end
@@ -135,7 +135,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: like item; a_label: detachable L; a_weight: REAL_64)
+	put_edge (a_start_node, a_end_node: like item; a_label: L; a_weight: REAL_64)
 			-- Create an edge with weight `a_weight' between `a_start_node' and `a_end_node'.
 			-- The edge will be labeled `a_label'.
 			-- For symmetric graphs, another edge is inserted in the opposite direction.
@@ -159,10 +159,8 @@ feature -- Element change
 			nodes_exist: has_node (a_start_node) and has_node (a_end_node)
 			simple_graph: is_simple_graph implies not has_edge_between (a_start_node, a_end_node)
 			-- TO BE IMPROVED!!
-		local
-			l: L
 		do
-			put_edge (a_start_node, a_end_node, l, a_weight)
+			put_edge (a_start_node, a_end_node, Void, a_weight)
 		ensure
 			simple_graph_criterion: is_simple_graph implies has_edge_between (a_start_node, a_end_node)
 			symmetric_graph_criterion: is_symmetric_graph implies has_edge_between (a_start_node, a_end_node) and
@@ -200,7 +198,7 @@ feature {NONE} -- Inapplicable
 			put_edge (a_start_node, a_end_node, a_label, 0)
 		end
 
-	unweighted_edge_from_values (a_start_node, a_end_node: like item; a_label: L): detachable EDGE [like item, L]
+	unweighted_edge_from_values (a_start_node, a_end_node: like item; a_label: L): EDGE [like item, L]
 			-- Edge that matches `a_start_node', `a_end_node' and `a_label'.
 			-- Result is Void if there is no match.
 			-- The cursor is not moved.
@@ -219,11 +217,8 @@ feature {NONE} -- Implementation
 
 	adopt_edge (a_edge: WEIGHTED_EDGE [like item, L])
 			-- Put `a_edge' into current graph.
-		local
-			l: L
 		do
-			l := a_edge.label
-			put_edge (a_edge.start_node, a_edge.end_node, l, a_edge.weight)
+			put_edge (a_edge.start_node, a_edge.end_node, a_edge.label, a_edge.weight)
 		end
 
 end -- class WEIGHTED_GRAPH

@@ -25,7 +25,7 @@ create
 
 feature {NONE} -- Initialization
 
-	make_directed (a_start_node, a_end_node: LINKED_GRAPH_NODE [G, L]; a_label: detachable L)
+	make_directed (a_start_node, a_end_node: LINKED_GRAPH_NODE [G, L]; a_label: L)
 			-- Make a directed edge from `a_start_node' to `a_end_node' with label `a_label'.
 		require
 			nodes_not_void: a_start_node /= Void and a_end_node /= Void
@@ -45,7 +45,7 @@ feature {NONE} -- Initialization
 			is_directed: is_directed
 		end
 
-	make_undirected (a_start_node, a_end_node: LINKED_GRAPH_NODE [G, L]; a_label: detachable L)
+	make_undirected (a_start_node, a_end_node: LINKED_GRAPH_NODE [G, L]; a_label: L)
 			-- Make an undirected edge from `a_start_node' to a_end_node' with label `a_label'.
 		require
 			nodes_not_void: a_start_node /= Void and a_end_node /= Void

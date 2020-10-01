@@ -14,7 +14,7 @@ note
 	revision: "$Revision: 1086 $"
 
 class
-	DFS_WALKER [G -> HASHABLE, L]
+	DFS_WALKER [G -> HASHABLE, reference L]
 
 inherit
 	ABSTRACT_FS_WALKER [G, L]
@@ -27,7 +27,7 @@ create
 
 feature -- Initialize
 
-	create_dispenser
+	create_dispenser 
 			-- Create the dispenser for a DFS walker
 		do
 			create {LINKED_STACK [GRAPH_CURSOR[G, L]]} dispenser.make

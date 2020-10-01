@@ -18,7 +18,7 @@ create
 
 feature {NONE} -- Initialization
 
-	make (a_node: detachable G; a_edge: detachable EDGE [G, L])
+	make (a_node: G; a_edge: EDGE [G, L]) 
 			-- Create a cursor for with attributes `a_node' and `a_edge'.
 		require
 			no_edge_when_off: (a_node = Void) implies (a_edge = Void)
@@ -32,10 +32,10 @@ feature {NONE} -- Initialization
 
 feature {GRAPH} -- Access
 
-	current_node: detachable G
+	current_node: G
 			-- Node at the current cursor position
 
-	edge_item: detachable EDGE [G, L]
+	edge_item: EDGE [G, L]
 			-- Edge which is currently focused
 
 invariant

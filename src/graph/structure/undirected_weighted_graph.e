@@ -10,7 +10,7 @@ note
 	revision: "$Revision: 1133 $"
 
 deferred class
-	UNDIRECTED_WEIGHTED_GRAPH [G -> HASHABLE, L]
+	UNDIRECTED_WEIGHTED_GRAPH [G -> HASHABLE, reference L]
 
 inherit
 	UNDIRECTED_GRAPH [G, L]
@@ -53,7 +53,7 @@ inherit
 
 feature -- Access
 
-	edge_item: detachable WEIGHTED_EDGE [like item, L]
+	edge_item: WEIGHTED_EDGE [like item, L]
 			-- Current edge
 		deferred
 		end
@@ -79,7 +79,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: like item; a_label: detachable L; a_weight: REAL_64)
+	put_edge (a_start_node, a_end_node: like item; a_label: L; a_weight: REAL_64)
 			-- Create an edge with weight `a_weight' between `a_start_node' and `a_end_node'.
 			-- The edge will be labeled `a_label'.
 			-- The cursor is not moved.
@@ -91,10 +91,8 @@ feature -- Element change
 	put_unlabeled_edge (a_start_node, a_end_node: like item; a_weight: REAL_64)
 			-- Create an edge with weight `a_weight' between `a_start_node' and `a_end_node'.
 			-- The cursor is not moved.
-		local
-			l: L
 		do
-			put_edge (a_start_node, a_end_node, l, a_weight)
+			put_edge (a_start_node, a_end_node, Void, a_weight)
 		ensure then
 			undirected_graph: has_edge_between (a_start_node, a_end_node) and has_edge_between (a_end_node, a_start_node)
 		end
@@ -115,10 +113,10 @@ feature -- Transformation
 			edge: like edge_item
 			node_list: like linear_representation
 			edge_list: ARRAYED_LIST [like edge_item]
+			lin_rep: LINEAR [like edge_item]
 			set_1, set_2: INTEGER
 			mst: like Current
 			uf: UNION_FIND_STRUCTURE [like item]
-			l: L
 		do
 			mst := empty_graph
 			node_list := linear_representation
@@ -138,15 +136,14 @@ feature -- Transformation
 
 			-- Put edges into sorted array (priority queue with lowest priority first).
 			create edge_list.make (0)
-			if attached {LINEAR [like edge_item]} edges.linear_representation as lin_rep then
-				from
-					lin_rep.start
-				until
-					lin_rep.after
-				loop
-					sorted_put (lin_rep.item, edge_list)
-					lin_rep.forth
-				end
+			from
+				lin_rep := edges.linear_representation
+				lin_rep.start
+			until
+				lin_rep.after
+			loop
+				sorted_put (lin_rep.item, edge_list)
+				lin_rep.forth
 			end
 
 			-- Traverse edges in increasing order and keep only the MST edges.
@@ -160,8 +157,7 @@ feature -- Transformation
 				set_2 := uf.find (edge.end_node)
 				if set_1 /= set_2 then
 					-- Keep edges that connect two independent graph parts.
-					l := edge.label
-					mst.put_edge (edge.start_node, edge.end_node, l, edge.weight)
+					mst.put_edge (edge.start_node, edge.end_node, edge.label, edge.weight)
 					uf.union (set_1, set_2)
 ----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 					debug ("mst")
@@ -202,11 +198,8 @@ feature {NONE} -- Implementation
 
 	adopt_edge (a_edge: WEIGHTED_EDGE [like item, L])
 			-- Put `a_edge' into current graph.
-		local
-			l: L
 		do
-			l := a_edge.label
-			put_edge (a_edge.start_node, a_edge.end_node, l, a_edge.weight)
+			put_edge (a_edge.start_node, a_edge.end_node, a_edge.label, a_edge.weight)
 		end
 
 	sorted_put (a_edge: like edge_item; edge_list: ARRAYED_LIST [like edge_item])

@@ -67,7 +67,7 @@ feature -- Access
 	end_node: G
 			-- End node of the edge
 
-	label: detachable L
+	label: L
 			-- Label of the edge
 
 	opposite_node (a_node: G): G
@@ -115,7 +115,7 @@ feature -- Comparison
 						  end_node.is_equal (other.start_node))
 			end
 			-- Labels must be equal.
-			Result := Result and equal (attached {ANY} label as l_lable, attached {ANY} other.label as o_label)
+			Result := Result and equal (label, other.label)
 		end
 
 feature -- Status setting
@@ -158,7 +158,7 @@ feature -- Basic operations
 
 feature -- Output
 
-	out: STRING
+	out: STRING 
 			-- Textual representation of the edge
 		do
 			Result := start_node.out
@@ -168,12 +168,10 @@ feature -- Output
 				Result.append (" -- ")
 			end
 			Result.append (end_node.out)
-			separate label as s_label do
-				if attached s_label as l_label and then not l_label.out.is_equal ("")  then
-					Result.append ("  [label=%"")
-					Result.append ((create {STRING}.make_from_separate (l_label.out)).out)
-					Result.append ("%"]")
-				end
+			if label /= Void and then not label.out.is_equal ("")  then
+				Result.append ("  [label=%"")
+				Result.append (label.out)
+				Result.append ("%"]")
 			end
 		end
 

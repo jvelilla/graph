@@ -127,19 +127,19 @@ feature -- Comparison
 			-- Is `other' attached to an object considered
 			-- equal to current object?
 		do
-				-- Start and end node must be equal.
+			-- Start and end node must be equal.
 			Result := start_node.is_equal (other.start_node) and
 					  end_node.is_equal (other.end_node)
 
-				-- Consider also flipped edges in undirected graphs.
+			-- Consider also flipped edges in undirected graphs.
 			if not is_directed then
 				Result := Result or
 						 (start_node.is_equal (other.end_node) and
 						  end_node.is_equal (other.start_node))
 			end
-				-- Labels must be equal.
-			Result := Result and equal (attached  {ANY} label as l_label, attached {ANY} other.label as o_label)
-				-- Weight must be equal.
+			-- Labels must be equal.
+			Result := Result and equal (label, other.label)
+			-- Weight must be equal.
 			Result := Result and weight = other.weight
 			Result := Result or standard_is_equal (other)
 		end
@@ -184,12 +184,10 @@ feature -- Output
 				Result.append (" -- ")
 			end
 			Result.append (end_node.out)
-			separate label as s_label do
-				if attached s_label as l_label and then not l_label.out.is_equal ("")  then
-					Result.append ("  [label=%"")
-					Result.append ((create {STRING}.make_from_separate (l_label.out)).out)
-					Result.append ("%"]")
-				end
+			if label /= Void and then not label.out.is_equal ("")  then
+				Result.append ("  [label=%"")
+				Result.append (label.out)
+				Result.append ("%"]")
 			end
 			Result.append ("  [weight=")
 			Result.append (weight.out)
@@ -201,7 +199,7 @@ feature {NONE} -- Implementation
 	internal_weight: REAL_64
 			-- Weight of the edge
 
-	weight_function: FUNCTION [TUPLE [WEIGHTED_EDGE [G, L]], REAL_64]
+	weight_function: FUNCTION [ANY, TUPLE [WEIGHTED_EDGE [G, L]], REAL_64]
 			-- User-defined function to compute `weight'.
 
 end -- class WEIGHTED_EDGE

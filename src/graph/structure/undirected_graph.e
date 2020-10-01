@@ -9,7 +9,7 @@ note
 	revision: "$Revision: 1086 $"
 
 deferred class
-	UNDIRECTED_GRAPH [G -> HASHABLE,  L]
+	UNDIRECTED_GRAPH [G -> HASHABLE, reference L]
 
 inherit
 	GRAPH [G, L]
@@ -113,7 +113,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: like item; a_label: detachable L)
+	put_edge (a_start_node, a_end_node: like item; a_label: L)
 			-- Create an edge between `a_start_node' and `a_end_node'
 			-- and set its label to `a_label'.
 			-- The cursor is not moved.
@@ -126,10 +126,8 @@ feature -- Element change
 	put_unlabeled_edge (a_start_node, a_end_node: like item)
 			-- Create an edge between `a_start_node' and `a_end_node'.
 			-- The cursor is not moved.
-		local
-			l: L
 		do
-			put_edge (a_start_node, a_end_node, l)
+			put_edge (a_start_node, a_end_node, Void)
 		ensure then
 			undirected_graph: has_edge_between (a_start_node, a_end_node) and has_edge_between (a_end_node, a_start_node)
 			edge_count: edge_count = old edge_count + 1
