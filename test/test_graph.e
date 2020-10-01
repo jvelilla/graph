@@ -124,9 +124,9 @@ feature -- Test routines
 
 	test_build_undirected_graph_string_with_labels_integer
 		local
-			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, INTEGER]
-			l_bfs: BFS_WALKER [STRING, INTEGER]
-			l_dfs: DFS_WALKER [STRING, INTEGER]
+			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, INTEGER_REF]
+			l_bfs: BFS_WALKER [STRING, INTEGER_REF]
+			l_dfs: DFS_WALKER [STRING, INTEGER_REF]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
