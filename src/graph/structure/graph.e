@@ -3,12 +3,11 @@ note
 		Directed graphs without commitment to a particular representation.
 		Simple graphs, multigraphs, directed graphs and symmetric graphs
 		are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2010-06-28 20:14:26 +0200 (Пн, 28 июн 2010) $"
+	date: "$Date: 2010-06-28 20:14:26 +0200 (�%/159/н, 28 и�%/142/н 2010) $"
 	revision: "$Revision: 1133 $"
-
 
 deferred class
 	GRAPH [G -> HASHABLE, reference L]
@@ -157,7 +156,7 @@ feature -- Access
 			void_when_off: off = (Result = Void)
 		end
 
-	nodes,vertices: SET [like item]
+	nodes, vertices: SET [like item]
 			-- All nodes of the graph
 		deferred
 		ensure
@@ -171,7 +170,7 @@ feature -- Access
 			edges_not_void: Result /= Void
 		end
 
-	edge_item: EDGE [like item,L]
+	edge_item: EDGE [like item, L]
 			-- Current edge
 		require
 			not_off: not off
@@ -205,10 +204,10 @@ feature -- Access
 		local
 			c: like cursor
 		do
-			-- Backup cursor
+				-- Backup cursor
 			c := cursor
 
-			create {LINKED_SET [like item]}Result.make
+			create {LINKED_SET [like item]} Result.make
 			from
 				start
 			until
@@ -218,7 +217,7 @@ feature -- Access
 				left
 			end
 
-			-- Restore cursor.
+				-- Restore cursor.
 			go_to (c)
 		ensure
 			result_not_void: Result /= Void
@@ -226,7 +225,7 @@ feature -- Access
 			multi_graph_neighbors: is_multi_graph implies Result.count <= out_degree
 		end
 
-	edge_from_values (a_start_node, a_end_node: like item; a_label: L): EDGE [like item,L]
+	edge_from_values (a_start_node, a_end_node: like item; a_label: L): EDGE [like item, L]
 			-- Edge that matches `a_start_node', `a_end_node' and `a_label'.
 			-- Result is Void if there is no matching edge in the graph.
 			-- The cursor is not moved.
@@ -244,7 +243,6 @@ feature -- Access
 		ensure
 			path_not_void: Result /= Void
 		end
-
 
 	linear_representation: LINEAR [like item]
 			-- Linear representation of the node set
@@ -298,10 +296,10 @@ feature -- Measurement
 		local
 			edge: like edge_item
 		do
-			-- Make backup of `target'.
+				-- Make backup of `target'.
 			edge := edge_item
 
-			-- Count all incident edges of `item'
+				-- Count all incident edges of `item'
 			from
 				start
 				Result := 0
@@ -312,7 +310,7 @@ feature -- Measurement
 				left
 			end
 
-			-- Restore `target'.
+				-- Restore `target'.
 			turn_to_edge (edge)
 		ensure then
 			same_direction: equal (edge_item, old edge_item)
@@ -331,7 +329,7 @@ feature -- Measurement
 			node_list := linear_representation
 			edge_list := edges.linear_representation
 
-			-- Initialize union-find data structure.
+				-- Initialize union-find data structure.
 			create uf.make (node_count)
 			from
 				node_list.start
@@ -342,7 +340,7 @@ feature -- Measurement
 				node_list.forth
 			end
 
-			-- Run the union-find algorithm over all edges of the graph.
+				-- Run the union-find algorithm over all edges of the graph.
 			from
 				edge_list.start
 			until
@@ -375,7 +373,7 @@ feature -- Status report
 	has_node (a_item: like item): BOOLEAN
 			-- Is `a_item' part of the node set?
 		do
-			-- Is there an item index for `a_item'?
+				-- Is there an item index for `a_item'?
 			Result := index_of_element.has (a_item)
 		end
 
@@ -430,17 +428,17 @@ feature -- Status report
 		local
 			c: like cursor
 		do
-			-- Make backup of cursor if necessary.
+				-- Make backup of cursor if necessary.
 			if not off then
 				c := cursor
 			end
 
 			search (a_edge.start_node)
 			if off then
-				-- Edge is not part of the graph.
+					-- Edge is not part of the graph.
 				Result := 0
 			else
-				-- Iterate over all outgoing edges to find matches.
+					-- Iterate over all outgoing edges to find matches.
 				from
 					start
 				until
@@ -453,7 +451,7 @@ feature -- Status report
 				end
 			end
 
-			-- Restore cursor.
+				-- Restore cursor.
 			if c /= Void then
 				go_to (c)
 			else
@@ -486,14 +484,14 @@ feature -- Status report
 		deferred
 		end
 
-	has_cycles: BOOLEAN 
+	has_cycles: BOOLEAN
 			-- Does the graph contain cyclic (directed) paths?
 		local
 			topo_sorter: TOPOLOGICAL_SORTER [like item]
 			el: LINEAR [like edge_item]
 			e: like edge_item
 		do
-			-- Perform topological sort to find cycles in the graph.
+				-- Perform topological sort to find cycles in the graph.
 			create topo_sorter.make
 			from
 				el := edges.linear_representation
@@ -513,7 +511,7 @@ feature -- Status report
 	is_dag: BOOLEAN
 			-- Is the graph a DAG? (directed acyclic graph)
 		do
-			-- DAG definition: connected graph without any cycles.
+				-- DAG definition: connected graph without any cycles.
 			Result := is_connected and not has_cycles
 		end
 
@@ -523,20 +521,20 @@ feature -- Status report
 			node_list: like linear_representation
 			c: like cursor
 		do
-			-- Definition: A directed graph is Eularian iff
-			-- it is connected and the in-degree and out-degree is equal for each node.
+				-- Definition: A directed graph is Eularian iff
+				-- it is connected and the in-degree and out-degree is equal for each node.
 
 			if is_symmetric_graph then
-				-- For symmetric graphs, the in- and out-degree is equal by definition.
+					-- For symmetric graphs, the in- and out-degree is equal by definition.
 				Result := is_connected
 			else
-				-- Backup cursor if necessary.
+					-- Backup cursor if necessary.
 				if not off then
 					c := cursor
 				end
 				Result := is_connected
 
-				-- Check degrees for non-symmetric graphs.
+					-- Check degrees for non-symmetric graphs.
 				node_list := linear_representation
 				from
 					node_list.start
@@ -548,7 +546,7 @@ feature -- Status report
 					node_list.forth
 				end
 
-				-- Restore cursor.
+					-- Restore cursor.
 				if c /= Void then
 					go_to (c)
 				else
@@ -594,13 +592,13 @@ feature -- Status report
 			neighbrs: LINKED_SET [like item]
 			out_deg: INTEGER
 		do
-			-- Backup cursor if necessary.
+				-- Backup cursor if necessary.
 			if not off then
 				c := cursor
 			end
 
-			-- The graph is a simple graph if the number of incident edges
-			-- and the number of neighbor nodes are equal for each node.
+				-- The graph is a simple graph if the number of incident edges
+				-- and the number of neighbor nodes are equal for each node.
 			from
 				Result := True
 				lin := linear_representation
@@ -625,7 +623,7 @@ feature -- Status report
 				lin.forth
 			end
 
-			-- Restore cursor.
+				-- Restore cursor.
 			if c /= Void then
 				go_to (c)
 			else
@@ -660,22 +658,22 @@ feature -- Status report
 			edge: like edge_item
 		do
 			graph_cursor ?= c
-			-- The focused node must be part of the graph in order to be valid.
+				-- The focused node must be part of the graph in order to be valid.
 			if (graph_cursor = Void) or else (not has_node (graph_cursor.current_node)) then
 				Result := False
 			else
 				edge := graph_cursor.edge_item
 				if edge /= Void then
-					-- The focused edge must also be part of the graph.
+						-- The focused edge must also be part of the graph.
 					Result := has_node (edge.end_node) and then has_edge (edge)
 				else
 					cur := cursor
 
-					-- A void edge is only allowed when there are no outgoing edges.
+						-- A void edge is only allowed when there are no outgoing edges.
 					search (graph_cursor.current_node)
 					Result := not has_links
 
-					-- Restore previous cursor position (if any).
+						-- Restore previous cursor position (if any).
 					if cur /= Void then
 						go_to (cur)
 					else
@@ -684,7 +682,6 @@ feature -- Status report
 				end
 			end
 		end
-
 
 feature -- Cursor movement
 
@@ -744,7 +741,7 @@ feature -- Cursor movement
 		require
 			not_off: not off
 		do
-			-- Reference equality has precedence over object equality.
+				-- Reference equality has precedence over object equality.
 			from
 				start
 			until
@@ -753,7 +750,7 @@ feature -- Cursor movement
 				left
 			end
 
-			-- If reference equality fails, try again with object equality.
+				-- If reference equality fails, try again with object equality.
 			if edge_item /= a_edge then
 				from
 					start
@@ -793,7 +790,7 @@ feature -- Element change
 		ensure
 			simple_graph_criterion: is_simple_graph implies has_edge_between (a_start_node, a_end_node)
 			symmetric_graph_criterion: is_symmetric_graph implies has_edge_between (a_start_node, a_end_node) and
-																  has_edge_between (a_end_node, a_start_node)
+				has_edge_between (a_end_node, a_start_node)
 			simple_edge_count: is_simple_graph implies edge_count = old edge_count + 1
 			symmetric_edge_count: is_symmetric_graph implies edge_count = old edge_count + 2
 		end
@@ -810,7 +807,7 @@ feature -- Element change
 		ensure
 			simple_graph_criterion: is_simple_graph implies has_edge_between (a_start_node, a_end_node)
 			symmetric_graph_criterion: is_symmetric_graph implies has_edge_between (a_start_node, a_end_node) and
-																  has_edge_between (a_end_node, a_start_node)
+				has_edge_between (a_end_node, a_start_node)
 			simple_edge_count: is_simple_graph implies edge_count = old edge_count + 1
 			symmetric_edge_count: is_symmetric_graph implies edge_count = old edge_count + 2
 			cursor_not_moved: equal (cursor, old cursor)
@@ -824,9 +821,9 @@ feature -- Removal
 			-- The cursor will turn right if `target' is removed.
 		deferred
 		ensure then
---| FIXME	-- off_when_item_removed: (not old off) and then equal (a_item, old item) implies off
---| FIXME	-- Above contract seems correct, but produces contract violation
---| FIXME	-- when `off' is true before routine invocation.
+				--| FIXME	-- off_when_item_removed: (not old off) and then equal (a_item, old item) implies off
+				--| FIXME	-- Above contract seems correct, but produces contract violation
+				--| FIXME	-- when `off' is true before routine invocation.
 			node_removed: not has_node (a_item)
 		end
 
@@ -944,36 +941,36 @@ feature -- Basic operations
 			e: like edge_item
 			dist: REAL_64
 		do
-			-- Shortest path algorithm used for both weighted and unweighted graphs.
-			-- In unweighted graphs, we look for the path with the minimum amount of edges.
+				-- Shortest path algorithm used for both weighted and unweighted graphs.
+				-- In unweighted graphs, we look for the path with the minimum amount of edges.
 
-			-- Make backup of old cursor position if necessary.
+				-- Make backup of old cursor position if necessary.
 			if not off then
 				c := cursor
 			end
 
-			-- Initialize data structure to keep track of half- or fully processed nodes.
+				-- Initialize data structure to keep track of half- or fully processed nodes.
 			prepare_path_finding
 			target_node := node_from_item (a_end_node)
 
-			-- Main algorithm: Explore reachable node set with breadth-first strategy.
-			-- Continue exploring from node with minimal distance from start node.
-			-- If a node is reached faster than before, update its distance
-			-- and store the edge where we came from.
+				-- Main algorithm: Explore reachable node set with breadth-first strategy.
+				-- Continue exploring from node with minimal distance from start node.
+				-- If a node is reached faster than before, update its distance
+				-- and store the edge where we came from.
 			from
-				-- Initialize start node.
+					-- Initialize start node.
 				node := node_from_item (a_start_node)
 				node.set_referrer (Void, Void, 0)
 				border_nodes.put (node)
 			until
 				border_nodes.is_empty or target_node.processed
 			loop
-				-- Get node with minimal distance
+					-- Get node with minimal distance
 				node := border_nodes.item
 				border_nodes.remove
 				node.set_processed
 
-				-- Put all items reachable from current node into `border_nodes'.
+					-- Put all items reachable from current node into `border_nodes'.
 				search (node.item)
 				from
 					el := incident_edges
@@ -985,8 +982,8 @@ feature -- Basic operations
 					focused_node := node_from_item (focused_item)
 					dist := node.distance + edge_length (el.item)
 					if dist < focused_node.distance then
-						-- Focused node has been reached faster than ever before:
-						-- Update its distance and keep track of the referring edge.
+							-- Focused node has been reached faster than ever before:
+							-- Update its distance and keep track of the referring edge.
 						focused_node.set_referrer (node, el.item, dist)
 						border_nodes.put (focused_node)
 					end
@@ -997,9 +994,9 @@ feature -- Basic operations
 			set_path_found (target_node.processed)
 
 			if path_found then
-				-- We have found a path connecting `a_start_node' and `a_end_node'.
-				-- Follow the referrer edges to build up the path
-				-- (traverse path in reverse order until the start node is reached).
+					-- We have found a path connecting `a_start_node' and `a_end_node'.
+					-- Follow the referrer edges to build up the path
+					-- (traverse path in reverse order until the start node is reached).
 				from
 					create path_impl.make
 					node := target_node
@@ -1009,9 +1006,9 @@ feature -- Basic operations
 				loop
 					e := node.referring_edge
 
-					-- Flip edges if necessary to make the output meaningful.
+						-- Flip edges if necessary to make the output meaningful.
 					if not it.is_equal (e.end_node) then
-						-- This can only happen in case of undirected edges.
+							-- This can only happen in case of undirected edges.
 						e.flip
 					end
 
@@ -1021,10 +1018,10 @@ feature -- Basic operations
 				end
 			end
 
-			-- Free memory used for annotated nodes.
+				-- Free memory used for annotated nodes.
 			annotated_nodes := Void
 
-			-- Restore old cursor position.
+				-- Restore old cursor position.
 			if c /= Void then
 				go_to (c)
 			else
@@ -1056,27 +1053,27 @@ feature -- Basic operations
 		local
 			was_simple_graph: BOOLEAN
 		do
-			-- Assume merge operation will succeed.
+				-- Assume merge operation will succeed.
 			set_merge_succeeded (True)
 
-			-- Put all nodes of `other' into current graph.
+				-- Put all nodes of `other' into current graph.
 			merge_nodes (other)
 
-			-- Convert current graph to a multigraph if necessary
-			-- to avoid errors with the "put_edge" command.
+				-- Convert current graph to a multigraph if necessary
+				-- to avoid errors with the "put_edge" command.
 			if is_simple_graph and has_multi_graph_support then
 				was_simple_graph := True
 				convert_to_multi_graph
 			end
 
-			-- Put all edges of `other' into current graph.
+				-- Put all edges of `other' into current graph.
 			if is_multi_graph then
 				merge_edges (other)
 			else
 				simple_merge_edges (other)
 			end
 
-			-- Convert the graph back to a simple graph if possible.
+				-- Convert the graph back to a simple graph if possible.
 			if was_simple_graph and is_multi_graph and reducible_multigraph then
 				convert_to_simple_graph
 			end
@@ -1145,8 +1142,7 @@ feature {NONE} -- Implementation
 	history_stack: ARRAYED_STACK [like cursor]
 			-- History of the visited nodes
 
-
-	-- Implementation for path finding algorithm
+		-- Implementation for path finding algorithm
 
 	annotated_nodes: ARRAY [NODE [like item, L]]
 			-- All graph nodes annotated with additional information
@@ -1176,8 +1172,8 @@ feature {NONE} -- Implementation
 			node: NODE [like item, L]
 			index: INTEGER
 		do
-			-- Build `nodes' list.
-			-- Use same indices as for ordinary items.
+				-- Build `nodes' list.
+				-- Use same indices as for ordinary items.
 			create annotated_nodes.make (1, node_count)
 			from
 				lin_rep := linear_representation
@@ -1192,7 +1188,7 @@ feature {NONE} -- Implementation
 				lin_rep.forth
 			end
 
-			-- Make empty border set.
+				-- Make empty border set.
 			create border_nodes.make (node_count)
 		end
 
@@ -1212,7 +1208,7 @@ feature {NONE} -- Implementation
 		require
 			edge_not_void: a_edge /= Void
 		do
-			-- Unweighted edges are all considered to have equal length.
+				-- Unweighted edges are all considered to have equal length.
 			Result := 1
 		end
 
@@ -1223,7 +1219,7 @@ feature {NONE} -- Implementation
 		local
 			item_linear: LINEAR [like item]
 		do
-			-- Put all nodes of `other' into current graph.
+				-- Put all nodes of `other' into current graph.
 			from
 				item_linear := other.nodes.linear_representation
 				item_linear.start
@@ -1247,10 +1243,10 @@ feature {NONE} -- Implementation
 			edge_linear: like edges
 			e: like edge_item
 		do
-			-- Merge edges of `other' into current graph.
-			-- The resulting edge set is the mathematic union of both
-			-- initial edge sets (important for multigraphs with several
-			-- identical edges).
+				-- Merge edges of `other' into current graph.
+				-- The resulting edge set is the mathematic union of both
+				-- initial edge sets (important for multigraphs with several
+				-- identical edges).
 			from
 				edge_linear := other.edges
 				edge_linear.start
@@ -1258,7 +1254,7 @@ feature {NONE} -- Implementation
 				edge_linear.after
 			loop
 				e := edge_linear.item
-				-- Union of edge sets.
+					-- Union of edge sets.
 				if edge_occurences (e) < other.edge_occurences (e) then
 					adopt_edge (e)
 				end
@@ -1278,8 +1274,8 @@ feature {NONE} -- Implementation
 			edge_linear: like edges
 			e: like edge_item
 		do
-			-- Merge edges of `other' into current graph.
-			-- Only edges preserving the simple graph property are processed.
+				-- Merge edges of `other' into current graph.
+				-- Only edges preserving the simple graph property are processed.
 			from
 				edge_linear := other.edges
 				edge_linear.start

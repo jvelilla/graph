@@ -15,7 +15,7 @@ inherit
 
 feature -- Test routines
 
-	test_prune_edge
+	test_prune_edge_simple_graph
 		local
 			l_graph: LINKED_GRAPH [STRING, STRING]
 		do
@@ -29,6 +29,24 @@ feature -- Test routines
 			assert ("Has edge a-b", l_graph.has_edge_between ("a", "b"))
 			l_graph.prune_edge_between ("a", "b")
 			assert ("Not has edge a-b", not l_graph.has_edge_between ("a", "b"))
+		end
+
+	test_prune_edge_symmetric_graph
+		local
+			l_graph: LINKED_GRAPH [STRING, STRING]
+		do
+				-- Create the graph
+			create l_graph.make_symmetric_graph
+
+				-- Put the nodes into the graph.
+			l_graph.put_node ("a")
+			l_graph.put_node ("b")
+			l_graph.put_edge ("a", "b", "a-b")
+			assert ("Has edge a-b", l_graph.has_edge_between ("a", "b"))
+			assert ("Has edge a-b", l_graph.has_edge_between ("b", "a"))
+			l_graph.prune_edge_between ("a", "b")
+			assert ("Not has edge a-b", not l_graph.has_edge_between ("a", "b"))
+			assert ("has edge a-b", not l_graph.has_edge_between ("b", "a"))
 		end
 
 end

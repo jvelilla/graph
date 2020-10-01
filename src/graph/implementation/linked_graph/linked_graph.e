@@ -3,10 +3,10 @@ note
 		Directed graphs, implemented as dynamically linked structure.
 		Simple graphs, multigraphs, symmetric graphs and symmetric
 		multigraphs are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2009-08-21 13:35:22 +0200 (Пт, 21 авг 2009) $"
+	date: "$Date: 2009-08-21 13:35:22 +0200 (�%/159/�%/130/, 21 авг 2009) $"
 	revision: "$Revision: 1098 $"
 
 class
@@ -56,12 +56,12 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	nodes,vertices: SET [like item]
+	nodes, vertices: SET [like item]
 			-- All nodes of the graph
 		local
 			i: INTEGER
 		do
-			-- Put all items of the node list into a set.
+				-- Put all items of the node list into a set.
 			create {ARRAYED_SET [like item]} Result.make (0)
 			from
 				i := 1
@@ -105,7 +105,7 @@ feature -- Access
 		do
 			create {ARRAYED_LIST [like edge_item]} Result.make (out_degree)
 
-			-- Backup current cursor.
+				-- Backup current cursor.
 			index := current_node.edge_list.index
 
 			from
@@ -118,7 +118,7 @@ feature -- Access
 				edge_list.forth
 			end
 
-			-- Restore old cursor.
+				-- Restore old cursor.
 			if edge_list.valid_index (index) then
 				edge_list.go_i_th (index)
 			end
@@ -132,7 +132,7 @@ feature -- Access
 		do
 			create {ARRAYED_LIST [L]} Result.make (out_degree)
 
-			-- Backup current cursor.
+				-- Backup current cursor.
 			index := current_node.edge_list.index
 
 			from
@@ -145,7 +145,7 @@ feature -- Access
 				edge_list.forth
 			end
 
-			-- Restore old cursor.
+				-- Restore old cursor.
 			if edge_list.valid_index (index) then
 				edge_list.go_i_th (index)
 			end
@@ -191,32 +191,32 @@ feature -- Measurement
 	in_degree: INTEGER
 			-- Number of incoming edges of the current node
 		do
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+				----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 			debug ("in_degree")
 				print ("in_degree of `" + item.out + "'%N")
 			end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+				----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 			from
 				internal_edges.start
 				Result := 0
 			until
 				internal_edges.after
 			loop
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+					----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 				debug ("in_degree")
 					print ("edge: " + internal_edges.item.out + "%N")
 				end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+					----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 				if internal_edges.item.internal_end_node = current_node then
 					Result := Result + 1
 				end
 				internal_edges.forth
 			end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+				----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 			debug ("in_degree")
 				print ("RESULT = " + Result.out + "%N%N")
 			end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+				----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 		end
 
 	out_degree: INTEGER
@@ -258,7 +258,7 @@ feature -- Status report
 
 			Result := not node.edge_list.exhausted
 
-			-- Restore edge list cursor.
+				-- Restore edge list cursor.
 			node.edge_list.go_i_th (index)
 		end
 
@@ -274,7 +274,7 @@ feature -- Status report
 			end_node := linked_node_from_item (a_end_node)
 			el := start_node.edge_list
 
-			-- Make backup of cursor.
+				-- Make backup of cursor.
 			index := el.index
 
 			from
@@ -288,7 +288,7 @@ feature -- Status report
 				el.forth
 			end
 
-			-- Restore cursor.
+				-- Restore cursor.
 			if el.valid_index (index) then
 				el.go_i_th (index)
 			end
@@ -354,7 +354,7 @@ feature -- Cursor movement
 			current_node.edge_list.back
 			if current_node.edge_list.index = 1 then
 				exhausted := True
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+					----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 			else
 				debug ("left")
 					print (" index = ")
@@ -363,7 +363,7 @@ feature -- Cursor movement
 					print (out_degree)
 					print (" ")
 				end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+					----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 			end
 		end
 
@@ -405,7 +405,7 @@ feature -- Element change
 			node: like current_node
 		do
 			if not index_of_element.has (a_node) then
-				-- Compute item index of new element.
+					-- Compute item index of new element.
 				if not inactive_nodes.is_empty then
 					inactive_nodes.start
 					index := inactive_nodes.item
@@ -414,8 +414,8 @@ feature -- Element change
 					index := node_count + 1
 				end
 
-				-- Create new node object and put it
-				-- into the list at appropriate position.
+					-- Create new node object and put it
+					-- into the list at appropriate position.
 				create node.make (a_node)
 				node_list.force (node, index)
 				index_of_element.force (index, a_node)
@@ -455,28 +455,28 @@ feature -- Removal
 			edge: like edge_item
 			dangling_edges: LINEAR [like edge_item]
 		do
-			-- Graph becomes `off' when current node is removed.
+				-- Graph becomes `off' when current node is removed.
 			if (not off) and equal (item, a_item) then
 				current_node := Void
 			elseif (not off) and equal (target, a_item) then
 				if out_degree > 1 then
-					-- Turn right if `target' is removed.
+						-- Turn right if `target' is removed.
 					right
 				else
 					exhausted := True
 				end
 			end
 
-			-- Get index of `a_item'.
+				-- Get index of `a_item'.
 			index := index_of_element.item (a_item)
 
 			if index > 0 then
-				-- Node found: remove `a_item' from node list.
+					-- Node found: remove `a_item' from node list.
 				node_list.put (Void, index)
 				inactive_nodes.extend (index)
 				index_of_element.remove (a_item)
 
-				-- Remove all incident edges of `a_item'.
+					-- Remove all incident edges of `a_item'.
 				from
 					dangling_edges := internal_edges.linear_representation
 					dangling_edges.start
@@ -485,17 +485,17 @@ feature -- Removal
 				loop
 					edge := dangling_edges.item
 					if edge.start_node.is_equal (a_item) then
-						-- Remove edge starting in `a_item'.
+							-- Remove edge starting in `a_item'.
 						internal_edges.prune (edge)
 					elseif edge.end_node.is_equal (a_item) then
-						-- Remove edge ending in `a_item'.
+							-- Remove edge ending in `a_item'.
 						prune_edge_impl (edge)
 					else
 						dangling_edges.forth
 					end
 				end
 
-				-- Adjust node counter.
+					-- Adjust node counter.
 				node_count := node_count - 1
 			end
 		end
@@ -508,7 +508,7 @@ feature -- Removal
 		do
 			prune_edge_impl (a_edge)
 			if is_symmetric_graph then
-				-- Find both start and end node in the node list.
+					-- Find both start and end node in the node list.
 				linked_edge ?= a_edge
 				if linked_edge /= Void then
 					start_node := linked_edge.internal_start_node
@@ -528,17 +528,17 @@ feature -- Removal
 		local
 			c: like cursor
 		do
-			-- Make backup of cursor if necessary.
+				-- Make backup of cursor if necessary.
 			if not off then
 				c := cursor
 			end
 
-			-- Search for the start node and prune the current edge.
+				-- Search for the start node and prune the current edge.
 			search (a_start_node)
 			turn_to_target (a_end_node)
 			remove_edge
 
-			-- Restore old cursor.
+				-- Restore old cursor.
 			if c /= Void then
 				go_to (c)
 			else
@@ -575,7 +575,7 @@ feature -- Output
 		do
 			Result := "digraph linked_graph%N"
 			Result.append ("{%N")
-			-- Iterate over all nodes.
+				-- Iterate over all nodes.
 			from
 				i := 1
 			until
@@ -586,9 +586,9 @@ feature -- Output
 					Result.append ("%"")
 					Result.append (node.item.out)
 					Result.append ("%";%N")
-					-- Iterate over all incident edges.
+						-- Iterate over all incident edges.
 					from
-						-- Store previous cursor position
+							-- Store previous cursor position
 						index := node.edge_list.index
 						node.edge_list.start
 					until
@@ -683,7 +683,7 @@ feature {NONE} -- Implementation
 		do
 			linked_edge ?= a_edge
 
-			-- Find both start and end node in the node list.
+				-- Find both start and end node in the node list.
 			if linked_edge /= Void then
 				start_node := linked_edge.internal_start_node
 				end_node := linked_edge.internal_end_node
@@ -693,17 +693,17 @@ feature {NONE} -- Implementation
 				create linked_edge.make_directed (start_node, end_node, a_edge.label)
 			end
 
-			-- Turn cursor if `edge_item' is removed.
+				-- Turn cursor if `edge_item' is removed.
 			if (not off) and then linked_edge.is_equal (edge_item) then
 				right
 			end
 
-			-- Make backup of cursor if necessary.
+				-- Make backup of cursor if necessary.
 			if not off then
 				c := cursor
 			end
 
-			-- Remove edge from linked graph representation.
+				-- Remove edge from linked graph representation.
 			current_node := start_node
 			turn_to_edge (a_edge)
 			current_node.edge_list.remove
@@ -713,8 +713,9 @@ feature {NONE} -- Implementation
 				internal_edges.prune (linked_edge)
 			end
 
-			-- Restore cursor.
+				-- Restore cursor.
 			if c /= Void then
+				c.remove_edge_item
 				go_to (c)
 			else
 				invalidate_cursor
@@ -752,7 +753,6 @@ feature {NONE} -- Status setting
 		do
 			is_symmetric_graph := a_value
 		end
-
 
 invariant
 
