@@ -791,7 +791,7 @@ feature -- Element change
 			simple_graph_criterion: is_simple_graph implies has_edge_between (a_start_node, a_end_node)
 			symmetric_graph_criterion: is_symmetric_graph implies has_edge_between (a_start_node, a_end_node) and
 				has_edge_between (a_end_node, a_start_node)
-			simple_edge_count: is_simple_graph implies edge_count = old edge_count + 1
+			simple_edge_count: is_simple_graph and not is_symmetric_graph implies edge_count = old edge_count + 1
 			symmetric_edge_count: is_symmetric_graph implies edge_count = old edge_count + 2
 		end
 
@@ -808,7 +808,7 @@ feature -- Element change
 			simple_graph_criterion: is_simple_graph implies has_edge_between (a_start_node, a_end_node)
 			symmetric_graph_criterion: is_symmetric_graph implies has_edge_between (a_start_node, a_end_node) and
 				has_edge_between (a_end_node, a_start_node)
-			simple_edge_count: is_simple_graph implies edge_count = old edge_count + 1
+			simple_edge_count: is_simple_graph and not is_symmetric_graph implies edge_count = old edge_count + 1
 			symmetric_edge_count: is_symmetric_graph implies edge_count = old edge_count + 2
 			cursor_not_moved: equal (cursor, old cursor)
 		end

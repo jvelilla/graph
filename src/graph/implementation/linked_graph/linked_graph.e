@@ -518,6 +518,7 @@ feature -- Removal
 					end_node := linked_node_from_item (a_edge.end_node)
 				end
 				create symmetric_edge.make_directed (end_node, start_node, a_edge.label)
+				current_node := end_node
 				prune_edge_impl (symmetric_edge)
 			end
 		end
