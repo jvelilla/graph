@@ -538,10 +538,14 @@ feature -- Removal
 			search (a_start_node)
 			turn_to_target (a_end_node)
 			remove_edge
-
 				-- Restore old cursor.
 			if c /= Void then
-				go_to (c)
+				c.remove_edge_item
+				if valid_cursor (c) then
+					go_to (c)
+				else
+					invalidate_cursor
+				end
 			else
 				invalidate_cursor
 			end
@@ -700,7 +704,7 @@ feature {NONE} -- Implementation
 			end
 
 				-- Make backup of cursor if necessary.
-			if not off then
+			if not off and not exhausted then
 				c := cursor
 			end
 
@@ -716,7 +720,6 @@ feature {NONE} -- Implementation
 
 				-- Restore cursor.
 			if c /= Void then
-				c.remove_edge_item
 				go_to (c)
 			else
 				invalidate_cursor

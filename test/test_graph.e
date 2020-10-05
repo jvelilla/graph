@@ -68,14 +68,13 @@ feature -- Test routines
 
 			l_graph.search ("z")
 			check
-			 	not_exits: l_graph.off
+				not_exits: l_graph.off
 			end
 
 			l_graph.search ("a")
 			check
-			 	exits: not l_graph.off
+				exits: not l_graph.off
 			end
-
 
 			across l_graph.path as ic loop
 				print (ic.item.out)
@@ -117,10 +116,9 @@ feature -- Test routines
 			l_graph.prune_edge_between ("a", "b")
 			l_graph.find_path ("a", "b")
 			check
-				not_has_path: not l_graph.path_found
+				not_has_edge: not l_graph.has_edge_between ("a", "b")
 			end
 		end
-
 
 	test_build_undirected_graph_string_with_labels_integer
 		local
@@ -163,14 +161,13 @@ feature -- Test routines
 
 			l_graph.search ("z")
 			check
-			 	not_exits: l_graph.off
+				not_exits: l_graph.off
 			end
 
 			l_graph.search ("a")
 			check
-			 	exits: not l_graph.off
+				exits: not l_graph.off
 			end
-
 
 			across l_graph.path as ic loop
 				print (ic.item.out)
@@ -209,7 +206,6 @@ feature -- Test routines
 			end
 			print ("%N=============================%N")
 		end
-
 
 	test_build_undirected_graph_string
 		local
@@ -252,14 +248,13 @@ feature -- Test routines
 
 			l_graph.search ("z")
 			check
-			 	not_exits: l_graph.off
+				not_exits: l_graph.off
 			end
 
 			l_graph.search ("a")
 			check
-			 	exits: not l_graph.off
+				exits: not l_graph.off
 			end
-
 
 			across l_graph.path as ic loop
 				print (ic.item.out)
@@ -285,7 +280,7 @@ feature -- Test routines
 			end
 
 				-- DFS walker
-			print ("%DFS walker")
+			print ("$FS walker")
 			create l_dfs.make (l_graph)
 			from
 				l_dfs.start
@@ -300,5 +295,4 @@ feature -- Test routines
 		end
 
 end
-
 

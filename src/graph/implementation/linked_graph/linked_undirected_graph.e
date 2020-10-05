@@ -151,7 +151,8 @@ feature -- Removal
 			end
 
 				-- Backup current cursor if necessary.
-			if not off then
+			if not off and not exhausted then
+				cursor.remove_edge_item
 				c := cursor
 			end
 
@@ -169,7 +170,7 @@ feature -- Removal
 			current_node := start_node
 			index := current_node.edge_list.index
 			turn_to_edge (a_edge)
-
+			current_node.edge_list.remove
 			if current_node.edge_list.valid_index (index) then
 				current_node.edge_list.go_i_th (index)
 			end
@@ -179,7 +180,6 @@ feature -- Removal
 
 				-- Restore cursor.
 			if c /= Void then
-				c.remove_edge_item
 				go_to (c)
 			else
 				invalidate_cursor
