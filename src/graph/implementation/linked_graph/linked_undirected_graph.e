@@ -2,10 +2,10 @@ note
 	description: "[
 		Undirected graphs, implemented as dynamically linked structure.
 		Both simple graphs and multigraphs are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2009-04-06 14:42:41 +0200 (Пн, 06 апр 2009) $"
+	date: "$Date: 2009-04-06 14:42:41 +0200 (�%/159/н, 06 ап�%/128/ 2009) $"
 	revision: "$Revision: 1086 $"
 
 class
@@ -17,7 +17,7 @@ inherit
 			in_degree as degree,
 			out_degree as degree
 		export {NONE}
-			is_dag
+ is_dag
 		undefine
 			adopt_edge,
 			components,
@@ -80,7 +80,7 @@ feature -- Status report
 			start_node := linked_node_from_item (a_start_node)
 			el := start_node.edge_list
 
-			-- Make backup of cursor.
+				-- Make backup of cursor.
 			index := el.index
 
 			from
@@ -94,7 +94,7 @@ feature -- Status report
 				el.forth
 			end
 
-			-- Restore cursor.
+				-- Restore cursor.
 			if el.valid_index (index) then
 				el.go_i_th (index)
 			end
@@ -135,7 +135,7 @@ feature -- Removal
 		do
 			linked_edge ?= a_edge
 
-			-- Find both start and end node in the node list.
+				-- Find both start and end node in the node list.
 			if linked_edge /= Void then
 				start_node := linked_edge.internal_start_node
 				end_node := linked_edge.internal_end_node
@@ -145,19 +145,19 @@ feature -- Removal
 				create linked_edge.make_directed (start_node, end_node, a_edge.label)
 			end
 
-			-- Turn cursor if `edge_item' is removed.
+				-- Turn cursor if `edge_item' is removed.
 			if (not off) and then linked_edge.is_equal (edge_item) then
 				right
 			end
 
-			-- Backup current cursor if necessary.
+				-- Backup current cursor if necessary.
 			if not off then
 				c := cursor
 			end
 
-			-- Remove edge from linked graph representation.
-			-- Note: End node must be processed first.
-			-- Otherwise, `turn_to_edge' produces contract violation.
+				-- Remove edge from linked graph representation.
+				-- Note: End node must be processed first.
+				-- Otherwise, `turn_to_edge' produces contract violation.
 			current_node := end_node
 			index := current_node.edge_list.index
 			turn_to_edge (a_edge)
@@ -170,15 +170,16 @@ feature -- Removal
 			index := current_node.edge_list.index
 			turn_to_edge (a_edge)
 
-			if current_node.edge_list.valid_index (index)  then
+			if current_node.edge_list.valid_index (index) then
 				current_node.edge_list.go_i_th (index)
 			end
 
 			internal_edges.start
 			internal_edges.prune (linked_edge)
 
-			-- Restore cursor.
+				-- Restore cursor.
 			if c /= Void then
+				c.remove_edge_item
 				go_to (c)
 			else
 				invalidate_cursor
