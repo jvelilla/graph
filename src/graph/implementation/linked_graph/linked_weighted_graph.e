@@ -4,10 +4,10 @@ note
 		dynamically linked structure.
 		Simple graphs, multigraphs, symmetric graphs
 		and symmetric multigraphs are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2010-06-28 20:14:26 +0200 (Пн, 28 июн 2010) $"
+	date: "$Date: 2010-06-28 20:14:26 +0200 (�%/159/н, 28 и�%/142/н 2010) $"
 	revision: "$Revision: 1133 $"
 
 class
@@ -29,6 +29,7 @@ inherit
 			put_unweighted_edge
 		redefine
 			edge_item,
+			prune_edge,
 			out
 		end
 
@@ -51,8 +52,8 @@ inherit
 			unweighted_edge_from_values,
 			forth,
 			out
---		redefine
---			border_nodes
+			--		redefine
+			--			border_nodes
 		end
 
 create
@@ -126,6 +127,30 @@ feature -- Element change
 
 feature -- Removal
 
+	prune_edge (a_edge: EDGE [like item, L])
+			-- Remove `a_edge' from the graph.
+		local
+			linked_edge, symmetric_edge: like edge_item
+			start_node, end_node: like current_node
+		do
+			prune_edge_impl (a_edge)
+			if is_symmetric_graph then
+					-- Find both start and end node in the node list.
+				linked_edge ?= a_edge
+				if linked_edge /= Void then
+					start_node := linked_edge.internal_start_node
+					end_node := linked_edge.internal_end_node
+				else
+					start_node := linked_node_from_item (a_edge.start_node)
+					end_node := linked_node_from_item (a_edge.end_node)
+				end
+				create symmetric_edge.make_directed (end_node, start_node, a_edge.label, linked_edge.weight)
+				current_node := end_node
+				prune_edge_impl (symmetric_edge)
+			end
+		end
+
+
 feature -- Resizing
 
 feature -- Transformation
@@ -144,7 +169,7 @@ feature -- Inapplicable
 
 feature -- Output
 
-	out: STRING 
+	out: STRING
 			-- Printable representation of the graph
 		local
 			node: like current_node
@@ -164,7 +189,7 @@ feature -- Output
 				Result.append (node.item.out)
 				Result.append ("%";%N")
 				from
-					-- Store previous cursor position
+						-- Store previous cursor position
 					index := node.edge_list.index
 					node.edge_list.start
 				until
