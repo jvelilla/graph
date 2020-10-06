@@ -29,6 +29,7 @@ inherit
 			put_unweighted_edge
 		redefine
 			edge_item,
+			prune_edge,
 			out
 		end
 
@@ -105,7 +106,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: like item; a_label: L; a_weight: REAL_64)
+	put_edge (a_start_node, a_end_node: like item; a_label: detachable L; a_weight: REAL_64)
 			-- Create an edge with weight `a_weight' between `a_start_node' and `a_end_node'.
 			-- The edge will be labeled `a_label'.
 			-- For symmetric graphs, another edge is inserted in the opposite direction.
@@ -128,6 +129,32 @@ feature -- Element change
 		end
 
 feature -- Removal
+prune_edge (a_edge: EDGE [like item, L])
+			-- Remove `a_edge' from the graph.
+		local
+			linked_edge: like edge_item
+			symmetric_edge: LINKED_GRAPH_WEIGHTED_EDGE [like item, L]
+			start_node, end_node: like current_node
+			l: L
+		do
+			prune_edge_impl (a_edge)
+			if is_symmetric_graph then
+				-- Find both start and end node in the node list.
+				linked_edge ?= a_edge
+				if linked_edge /= Void then
+					start_node := linked_edge.internal_start_node
+					end_node := linked_edge.internal_end_node
+				else
+					start_node := linked_node_from_item (a_edge.start_node)
+					end_node := linked_node_from_item (a_edge.end_node)
+				end
+				if attached end_node and then attached start_node then
+					l := a_edge.label
+					create symmetric_edge.make_directed (end_node, start_node, l, linked_edge.weight)
+					prune_edge_impl (symmetric_edge)
+				end
+			end
+		end
 
 feature -- Resizing
 

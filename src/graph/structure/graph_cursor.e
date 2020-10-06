@@ -38,6 +38,13 @@ feature {GRAPH} -- Access
 	edge_item: detachable EDGE [G, L]
 			-- Edge which is currently focused
 
+feature	{GRAPH} -- Change Element
+
+	remove_edge_item
+		do
+			edge_item := Void
+		end
+
 invariant
 
 	no_edge_when_off: (current_node = Void) implies (edge_item = Void)

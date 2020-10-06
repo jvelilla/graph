@@ -2,10 +2,10 @@ note
 	description: "[
 		Undirected graphs, implemented as dynamically linked structure.
 		Both simple graphs and multigraphs are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2009-04-06 14:42:41 +0200 (Пн, 06 апр 2009) $"
+	date: "$Date: 2009-04-06 14:42:41 +0200 (�%/159/н, 06 ап�%/128/ 2009) $"
 	revision: "$Revision: 1086 $"
 
 class
@@ -75,12 +75,12 @@ feature -- Status report
 		local
 			index: INTEGER
 			start_node: like current_node
---			el: TWO_WAY_CIRCULAR [like edge_item]
+			--			el: TWO_WAY_CIRCULAR [like edge_item]
 		do
 			start_node := linked_node_from_item (a_start_node)
-			if attached {TWO_WAY_CIRCULAR [like edge_item]} start_node.edge_list as el  then
+			if attached {TWO_WAY_CIRCULAR [like edge_item]} start_node.edge_list as el then
 
-				-- Make backup of cursor.
+					-- Make backup of cursor.
 				index := el.index
 
 				from
@@ -94,7 +94,7 @@ feature -- Status report
 					el.forth
 				end
 
-				-- Restore cursor.
+					-- Restore cursor.
 				if el.valid_index (index) then
 					el.go_i_th (index)
 				end
@@ -128,11 +128,11 @@ feature -- Element change
 feature -- Removal
 
 	prune_edge (a_edge: EDGE [like item, L])
-	--prune_edge (a_edge: like edge_item)
+			--prune_edge (a_edge: like edge_item)
 			-- Remove `a_edge' from the graph.
 			-- The cursor will turn right if `current_egde' is removed.
 		local
-			--linked_edge:  like edge_item
+				--linked_edge:  like edge_item
 			linked_edge: LINKED_GRAPH_EDGE [like item, L]
 			start_node, end_node: like current_node
 			c: like cursor
@@ -140,7 +140,7 @@ feature -- Removal
 		do
 			linked_edge ?= a_edge
 
-			-- Find both start and end node in the node list.
+				-- Find both start and end node in the node list.
 			if linked_edge /= Void then
 				start_node := linked_edge.internal_start_node
 				end_node := linked_edge.internal_end_node
@@ -152,19 +152,20 @@ feature -- Removal
 				end
 			end
 
-			-- Turn cursor if `edge_item' is removed.
+				-- Turn cursor if `edge_item' is removed.
 			if (not off) and then attached edge_item as l_edge_item and then linked_edge.is_equal (l_edge_item) then
 				right
 			end
 
-			-- Backup current cursor if necessary.
-			if not off then
+				-- Backup current cursor if necessary.
+			if not off and not exhausted then
+				cursor.remove_edge_item
 				c := cursor
 			end
 
-			-- Remove edge from linked graph representation.
-			-- Note: End node must be processed first.
-			-- Otherwise, `turn_to_edge' produces contract violation.
+				-- Remove edge from linked graph representation.
+				-- Note: End node must be processed first.
+				-- Otherwise, `turn_to_edge' produces contract violation.
 			current_node := end_node
 			index := current_node.edge_list.index
 			turn_to_edge (a_edge)
@@ -176,18 +177,17 @@ feature -- Removal
 			current_node := start_node
 			index := current_node.edge_list.index
 			turn_to_edge (a_edge)
-
-			if current_node.edge_list.valid_index (index)  then
+			current_node.edge_list.remove
+			if current_node.edge_list.valid_index (index) then
 				current_node.edge_list.go_i_th (index)
 			end
 
-			internal_edges.start
 			if attached {like edge_item} linked_edge as l_linked_edge and then attached {ARRAYED_LIST [like edge_item]} internal_edges as l_internal_edges and then l_internal_edges.has (l_linked_edge) then
 				l_internal_edges.start
 				l_internal_edges.prune (l_linked_edge)
 			end
 
-			-- Restore cursor.
+				-- Restore cursor.
 			if c /= Void then
 				go_to (c)
 			else

@@ -108,13 +108,16 @@ feature -- Access
 
 			-- Backup current cursor.
 			index := current_node.edge_list.index
-			if attached {TWO_WAY_CIRCULAR [like edge_item]} current_node.edge_list as edge_list then
+--			if attached {TWO_WAY_CIRCULAR [like edge_item]} current_node.edge_list as edge_list then
+			if attached { TWO_WAY_CIRCULAR [detachable LINKED_GRAPH_EDGE [like item, L]]} current_node.edge_list as edge_list then
 				from
 					edge_list.start
 				until
 					edge_list.exhausted
 				loop
-					Result.extend (edge_list.item)
+					if attached {like edge_item } edge_list.item as l_item then
+						Result.extend (l_item)
+					end
 					edge_list.forth
 				end
 
@@ -279,7 +282,8 @@ feature -- Status report
 		do
 			start_node := linked_node_from_item (a_start_node)
 			end_node := linked_node_from_item (a_end_node)
-			if attached { TWO_WAY_CIRCULAR [like edge_item]} start_node.edge_list as el then
+--			if attached { TWO_WAY_CIRCULAR [like edge_item]} start_node.edge_list as el then
+			if attached { TWO_WAY_CIRCULAR [detachable LINKED_GRAPH_EDGE [like item, L]]} start_node.edge_list as el then
 
 				-- Make backup of cursor.
 				index := el.index
@@ -556,7 +560,12 @@ feature -- Removal
 
 			-- Restore old cursor.
 			if c /= Void then
-				go_to (c)
+				c.remove_edge_item
+				if valid_cursor (c) then
+					go_to (c)
+				else
+					invalidate_cursor
+				end
 			else
 				invalidate_cursor
 			end
@@ -718,7 +727,7 @@ feature {NONE} -- Implementation
 			end
 
 			-- Make backup of cursor if necessary.
-			if not off then
+			if not off and then not exhausted then
 				c := cursor
 			end
 
