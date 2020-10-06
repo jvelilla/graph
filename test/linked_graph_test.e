@@ -21,6 +21,7 @@ feature -- Test routines
 			l_nodes: SET [like {LINKED_GRAPH [STRING, STRING]}.item]
 			l_edges: LIST [like {LINKED_GRAPH [STRING, STRING]}.edge_item]
 			l_incident_labels: LIST [STRING]
+			l_neighbors: SET [STRING]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -61,6 +62,18 @@ feature -- Test routines
 				assert ("Expected incient_labels item ", ∀ i: l_item_incident_lables ¦ l_incident_labels.has (i))
 			end
 
+			create {ARRAYED_SET [STRING]} l_neighbors.make (1)
+			l_neighbors.compare_objects
+			l_neighbors.put ("b")
+			l_graph.search ("a")
+			assert ("All neighbors exist", ∀ n: l_graph.neighbors ¦ l_neighbors.has (n))
+
+			create {ARRAYED_SET [STRING]} l_neighbors.make (1)
+			l_neighbors.compare_objects
+			l_neighbors.put ("a")
+			l_graph.search ("b")
+			assert ("All neighbors exist", ∀ n: l_graph.neighbors ¦ l_neighbors.has (n))
+
 			assert ("Number of nodes 2", l_graph.node_count = 2)
 			assert ("All nodes exist", ∀ n: l_graph.nodes ¦ l_nodes.has (n))
 
@@ -75,6 +88,7 @@ feature -- Test routines
 			l_nodes: SET [like {LINKED_GRAPH [STRING, STRING]}.item]
 			l_edges: LIST [like {LINKED_GRAPH [STRING, STRING]}.edge_item]
 			l_incident_labels: LIST [STRING]
+			l_neighbors: SET [STRING]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -143,6 +157,28 @@ feature -- Test routines
 				assert ("Expected item a", l_graph.item.is_equal ("d"))
 				assert ("Expected incient_labels item ", ∀ i: l_item_incident_lables ¦ l_incident_labels.has (i))
 			end
+
+			create {ARRAYED_SET [STRING]} l_neighbors.make (2)
+			l_neighbors.compare_objects
+			l_neighbors.put ("b")
+			l_neighbors.put ("c")
+			l_graph.search ("a")
+			assert ("All neighbors exist", ∀ n: l_graph.neighbors ¦ l_neighbors.has (n))
+
+			create {ARRAYED_SET [STRING]} l_neighbors.make (2)
+			l_neighbors.compare_objects
+			l_neighbors.put ("a")
+			l_neighbors.put ("c")
+			l_graph.search ("b")
+			assert ("All neighbors exist", ∀ n: l_graph.neighbors ¦ l_neighbors.has (n))
+
+			create {ARRAYED_SET [STRING]} l_neighbors.make (3)
+			l_neighbors.compare_objects
+			l_neighbors.put ("a")
+			l_neighbors.put ("b")
+			l_neighbors.put ("d")
+			l_graph.search ("c")
+			assert ("All neighbors exist", ∀ n: l_graph.neighbors ¦ l_neighbors.has (n))
 
 			assert ("Number of nodes 4", l_graph.node_count = 4)
 			assert ("All nodes exist", ∀ n: l_graph.nodes ¦ l_nodes.has (n))
