@@ -31,12 +31,24 @@ feature -- Test routines
 			l_graph.put_node ("b")
 			l_graph.put_edge ("a", "b", "a-b")
 
+			assert ("Number of edges", l_graph.edge_count = 1)
+
+			l_graph.search ("a")
+			assert ("Expected in_degree (a)", l_graph.in_degree = 0)
+
+			l_graph.search ("b")
+			assert ("Expected in_degree (b)", l_graph.in_degree = 1)
+
+			l_graph.search ("a")
+			assert ("Expected out_degree (a)", l_graph.out_degree = 1)
+
+			l_graph.search ("b")
+			assert ("Expected out_degree (a)", l_graph.out_degree = 0)
+
 			create {ARRAYED_SET [like {LINKED_GRAPH [STRING, STRING]}.item]} l_nodes.make (2)
 			l_nodes.compare_objects
 			l_nodes.put ("a")
 			l_nodes.put ("b")
-
-			assert ("Number of edges", l_graph.edge_count = 1)
 
 			create {ARRAYED_LIST [like {LINKED_GRAPH [STRING, STRING]}.edge_item]} l_edges.make (1)
 			l_edges.compare_objects
@@ -104,6 +116,30 @@ feature -- Test routines
 			l_graph.put_edge ("a", "c", "a-c")
 			l_graph.put_edge ("b", "c", "b-c")
 			l_graph.put_edge ("c", "d", "c-d")
+
+			l_graph.search ("a")
+			assert ("Expected in_degree (a)", l_graph.in_degree = 0)
+
+			l_graph.search ("b")
+			assert ("Expected in_degree (b)", l_graph.in_degree = 1)
+
+			l_graph.search ("c")
+			assert ("Expected in_degree (c)", l_graph.in_degree = 2)
+
+			l_graph.search ("d")
+			assert ("Expected in_degree (d)", l_graph.in_degree = 1)
+
+			l_graph.search ("a")
+			assert ("Expected out_degree (a)", l_graph.out_degree = 2)
+
+			l_graph.search ("b")
+			assert ("Expected out_degree (b)", l_graph.out_degree = 1)
+
+			l_graph.search ("c")
+			assert ("Expected out_degree (c)", l_graph.out_degree = 1)
+
+			l_graph.search ("d")
+			assert ("Expected out_degree (d)", l_graph.out_degree = 0)
 
 			create {ARRAYED_SET [like {LINKED_GRAPH [STRING, STRING]}.item]} l_nodes.make (4)
 			l_nodes.compare_objects
