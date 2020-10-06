@@ -2,10 +2,10 @@ note
 	description: "[
 		Directed or undirected graph edges that consist of
 		two node items and a label.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2009-08-21 13:35:22 +0200 (Пт, 21 авг 2009) $"
+	date: "$Date: 2009-08-21 13:35:22 +0200 (�%/159/�%/130/, 21 авг 2009) $"
 	revision: "$Revision: 1098 $"
 
 class
@@ -34,9 +34,9 @@ feature {NONE} -- Initialization
 			is_directed := True
 		ensure
 			nodes_not_void: start_node /= Void and
-							end_node /= Void
+				end_node /= Void
 			nodes_assigned: start_node = a_start_node and
-							end_node = a_end_node
+				end_node = a_end_node
 			label_set: label = a_label
 			is_directed: is_directed
 		end
@@ -52,9 +52,9 @@ feature {NONE} -- Initialization
 			is_directed := False
 		ensure
 			nodes_not_void: start_node /= Void and
-							end_node /= Void
+				end_node /= Void
 			nodes_assigned: start_node = a_start_node and
-							end_node = a_end_node
+				end_node = a_end_node
 			label_set: label = a_label
 			not_directed: not is_directed
 		end
@@ -104,17 +104,17 @@ feature -- Comparison
 			-- Is `other' attached to an object considered
 			-- equal to current object?
 		do
-			-- Start and end node must be equal.
+				-- Start and end node must be equal.
 			Result := start_node.is_equal (other.start_node) and
-					  end_node.is_equal (other.end_node)
+				end_node.is_equal (other.end_node)
 
-			-- Consider also flipped edges in undirected graphs.
+				-- Consider also flipped edges in undirected graphs.
 			if not is_directed then
 				Result := Result or
-						 (start_node.is_equal (other.end_node) and
-						  end_node.is_equal (other.start_node))
+					(start_node.is_equal (other.end_node) and
+						end_node.is_equal (other.start_node))
 			end
-			-- Labels must be equal.
+				-- Labels must be equal.
 			Result := Result and equal (attached {ANY} label as l_lable, attached {ANY} other.label as o_label)
 		end
 
@@ -169,7 +169,7 @@ feature -- Output
 			end
 			Result.append (end_node.out)
 			separate label as s_label do
-				if attached s_label as l_label and then not l_label.out.is_equal ("")  then
+				if attached s_label as l_label and then not l_label.out.is_equal ("") then
 					Result.append ("  [label=%"")
 					Result.append ((create {STRING}.make_from_separate (l_label.out)).out)
 					Result.append ("%"]")

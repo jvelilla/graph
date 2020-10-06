@@ -733,8 +733,10 @@ feature -- Cursor movement
 			-- Move cursor to position `c' and turn to the according edge.
 			-- `exhausted' is set if that edge cannot be focused.
 		do
-			if attached c.current_node as l_node and then attached c.edge_item as l_edge_item then
+			if attached c.current_node as l_node then
 				search (l_node)
+			end
+			if attached c.edge_item as l_edge_item then
 				turn_to_edge (l_edge_item)
 			end
 		ensure then
