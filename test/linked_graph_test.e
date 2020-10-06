@@ -1,4 +1,4 @@
-note
+﻿note
 	description: "[
 		Eiffel tests that can be executed by testing tool.
 	]"
@@ -18,6 +18,7 @@ feature -- Test routines
 	test_prune_edge_simple_graph
 		local
 			l_graph: LINKED_GRAPH [STRING, STRING]
+			l_nodes: SET [like {LINKED_GRAPH [STRING, STRING]}.item]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -26,11 +27,19 @@ feature -- Test routines
 			l_graph.put_node ("a")
 			l_graph.put_node ("b")
 			l_graph.put_edge ("a", "b", "a-b")
+
+			create {ARRAYED_SET [like {LINKED_GRAPH [STRING, STRING]}.item]} l_nodes.make (2)
+			l_nodes.compare_objects
+			l_nodes.put ("a")
+			l_nodes.put ("b")
+
+			assert ("Number of nodes 2", l_graph.node_count = 2)
+			assert ("Nodes", ∀ n: l_graph.nodes ¦ l_nodes.has (n))
+
 			assert ("Has edge a-b", l_graph.has_edge_between ("a", "b"))
 			l_graph.prune_edge_between ("a", "b")
 			assert ("Not has edge a-b", not l_graph.has_edge_between ("a", "b"))
 		end
-
 
 	test_prune_edge_simple_graph_2
 		local
