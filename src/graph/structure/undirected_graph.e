@@ -167,7 +167,9 @@ feature {NONE} -- Implementation
 	opposite_node (a_edge: like edge_item; a_node: like item): like item
 			-- End node of `a_edge' when `a_node' is the start node
 		do
-			Result := a_edge.opposite_node (a_node)
+			check attached a_edge as l_edge  then
+				Result := a_edge.opposite_node (a_node)
+			end
 		end
 
 end -- class UNDIRECTED_GRAPH

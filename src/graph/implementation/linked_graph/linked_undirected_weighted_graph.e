@@ -138,8 +138,8 @@ feature -- Output
 			-- Textual representation of the graph
 		local
 			i, index: INTEGER
-			node: like current_node
-			edge: like edge_item
+			-- node: like current_node
+			-- edge: like edge_item
 			edges_todo: like edges
 		do
 			Result := "graph linked_undirected_graph%N"
@@ -153,38 +153,40 @@ feature -- Output
 			until
 				i > node_count
 			loop
-				node := node_list.item (i)
-				Result.append ("%"")
-				Result.append (node.item.out)
-				Result.append ("%";%N")
-				from
-					index := node.edge_list.index
-					node.edge_list.start
-				until
-					node.edge_list.exhausted
-				loop
-					edge ?= node.edge_list.item
-					if edges_todo.has (edge) then
-						Result.append ("  %"")
-						Result.append (node.item.out)
-						Result.append ("%" -- %"")
-						Result.append (edge.opposite_node (node.item).out)
-						Result.append ("%" [label=%"")
+				if attached node_list.item (i) as node then
+					Result.append ("%"")
+					Result.append (node.item.out)
+					Result.append ("%";%N")
+					from
+						index := node.edge_list.index
+						node.edge_list.start
+					until
+						node.edge_list.exhausted
+					loop
+						if attached {like edge_item} node.edge_list.item as edge then
+							if edges_todo.has (edge) then
+								Result.append ("  %"")
+								Result.append (node.item.out)
+								Result.append ("%" -- %"")
+								Result.append (edge.opposite_node (node.item).out)
+								Result.append ("%" [label=%"")
 
-						if attached {ANY} node.edge_list.item.label as label and then label /= Void and then not label.out.is_equal ("") then
-							Result.append (label.out)
-							Result.append ("\n")
+								if attached {ANY} node.edge_list.item.label as label and then label /= Void and then not label.out.is_equal ("") then
+									Result.append (label.out)
+									Result.append ("\n")
+								end
+								Result.append ("w = ")
+								Result.append (edge.weight.out)
+								Result.append ("%"];%N")
+								edges_todo.start
+								edges_todo.prune (edge)
+							end
 						end
-						Result.append ("w = ")
-						Result.append (edge.weight.out)
-						Result.append ("%"];%N")
-						edges_todo.start
-						edges_todo.prune (edge)
+						node.edge_list.forth
 					end
-					node.edge_list.forth
-				end
-				if node.edge_list.valid_index (index) then
-					node.edge_list.go_i_th (index)
+					if node.edge_list.valid_index (index) then
+						node.edge_list.go_i_th (index)
+					end
 				end
 				i := i + 1
 			end

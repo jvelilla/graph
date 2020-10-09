@@ -89,7 +89,7 @@ feature -- Access
 			-- Weight of the edge
 		do
 			if attached weight_function as l_weight_function then
-				Result := weight_function.item ([Current])
+				Result := l_weight_function.item ([Current])
 			else
 				Result := internal_weight
 			end

@@ -112,7 +112,7 @@ feature -- Transformation
 			connected_graph: is_connected
 			positive_weights: all_weights_positive
 		local
-			edge: like edge_item
+			-- edge: like edge_item
 			node_list: like linear_representation
 			edge_list: ARRAYED_LIST [like edge_item]
 			set_1, set_2: INTEGER
@@ -155,19 +155,21 @@ feature -- Transformation
 				edge_list.is_empty
 			loop
 				edge_list.start
-				edge := edge_list.item
-				set_1 := uf.find (edge.start_node)
-				set_2 := uf.find (edge.end_node)
-				if set_1 /= set_2 then
-					-- Keep edges that connect two independent graph parts.
-					l := edge.label
-					mst.put_edge (edge.start_node, edge.end_node, l, edge.weight)
-					uf.union (set_1, set_2)
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
-					debug ("mst")
-						print ("MST: Keeping edge `" + edge.out + "'%N")
+--				edge := edge_list.item
+				if attached edge_list.item as edge then
+					set_1 := uf.find (edge.start_node)
+					set_2 := uf.find (edge.end_node)
+					if set_1 /= set_2 then
+						-- Keep edges that connect two independent graph parts.
+						l := edge.label
+						mst.put_edge (edge.start_node, edge.end_node, l, edge.weight)
+						uf.union (set_1, set_2)
+	----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+						debug ("mst")
+							print ("MST: Keeping edge `" + edge.out + "'%N")
+						end
+	----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 					end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 				end
 				edge_list.remove
 			end
@@ -234,7 +236,7 @@ feature {NONE} -- Implementation
 					r <= (l+1)
 				loop
 					p := (l+r) // 2
-					if edge_list.i_th (p).weight < a_edge.weight then
+					if attached edge_list.i_th (p) as l_item and then l_item.weight < a_edge.weight then
 						l := p
 					else
 						r := p
@@ -243,7 +245,7 @@ feature {NONE} -- Implementation
 
 				-- Decide whether to insert the new item at the left or right.
 				edge_list.go_i_th (l)
-				if edge_list.item.weight < a_edge.weight then
+				if attached edge_list.item as l_item and then l_item.weight < a_edge.weight then
 					edge_list.put_right (a_edge)
 				else
 					edge_list.put_left (a_edge)

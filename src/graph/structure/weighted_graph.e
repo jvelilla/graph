@@ -63,7 +63,9 @@ feature -- Measurement
 				until
 					lin_rep.after
 				loop
-					Result := Result + lin_rep.item.weight
+					if attached lin_rep.item as l_item then
+						Result := Result + l_item.weight
+					end
 					lin_rep.forth
 				end
 			end
@@ -83,7 +85,7 @@ feature -- Status report
 				until
 					not Result or lin_rep.after
 				loop
-					if lin_rep.item.weight < 0 then
+					if attached lin_rep.item as l_item and then l_item.weight < 0 then
 						Result := False
 					end
 					lin_rep.forth
