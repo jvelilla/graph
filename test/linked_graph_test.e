@@ -226,7 +226,7 @@ feature -- Test routines
 			assert ("Found", not l_graph.path_found)
 		end
 
-	test__symmetric_graph
+	test_symmetric_graph
 		local
 			l_graph: LINKED_GRAPH [STRING, STRING]
 			l_nodes: SET [like {LINKED_GRAPH [STRING, STRING]}.item]
