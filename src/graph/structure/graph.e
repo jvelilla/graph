@@ -445,34 +445,39 @@ feature -- Status report
 		local
 			c: like cursor
 		do
-				-- Make backup of cursor if necessary.
-			if not off then
-				c := cursor
-			end
-
-			search (a_edge.start_node)
-			if off then
-					-- Edge is not part of the graph.
-				Result := 0
-			else
-					-- Iterate over all outgoing edges to find matches.
-				from
-					start
-				until
-					exhausted
-				loop
-					if attached edge_item as l_edge_item and then l_edge_item.is_equal (a_edge) then
-						Result := Result + 1
-					end
-					left
+			check attached a_edge then
+					-- Make backup of cursor if necessary.
+				if not off then
+					c := cursor
 				end
-			end
 
-				-- Restore cursor.
-			if c /= Void then
-				go_to (c)
-			else
-				invalidate_cursor
+				if attached a_edge then
+					search (a_edge.start_node)
+				end
+
+				if off then
+						-- Edge is not part of the graph.
+					Result := 0
+				else
+						-- Iterate over all outgoing edges to find matches.
+					from
+						start
+					until
+						exhausted
+					loop
+						if attached edge_item as l_edge_item and then l_edge_item.is_equal (a_edge) then
+							Result := Result + 1
+						end
+						left
+					end
+				end
+
+					-- Restore cursor.
+				if c /= Void then
+					go_to (c)
+				else
+					invalidate_cursor
+				end
 			end
 		end
 

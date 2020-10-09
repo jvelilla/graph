@@ -216,7 +216,9 @@ feature {NONE} -- Implementation
 	edge_length (a_edge: like edge_item): REAL_64
 			-- Edge length, used in `find_path' and `shortest_path' algorithm
 		do
-			Result := a_edge.weight
+			check attached a_edge then
+				Result := a_edge.weight
+			end
 		end
 
 	adopt_edge (a_edge: WEIGHTED_EDGE [like item, L])

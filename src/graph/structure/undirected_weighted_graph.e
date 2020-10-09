@@ -220,35 +220,37 @@ feature {NONE} -- Implementation
 		local
 			l, r, p: INTEGER
 		do
-			-- Note: This routine is necessary because `WEIGHTED_EDGE' cannot
-			-- inherit from `COMPARABLE' (failure of `is_equal' because of
-			-- trichotomy postcondition). Hence no sortable data structure can be used.
-			if edge_list.is_empty then
-				edge_list.extend (a_edge)
-			else
-				-- Find insertion position for `edge_list' via binary search.
-				from
-					l := 1
-					r := edge_list.count
-				variant
-					r-l
-				until
-					r <= (l+1)
-				loop
-					p := (l+r) // 2
-					if attached edge_list.i_th (p) as l_item and then l_item.weight < a_edge.weight then
-						l := p
-					else
-						r := p
-					end
-				end
-
-				-- Decide whether to insert the new item at the left or right.
-				edge_list.go_i_th (l)
-				if attached edge_list.item as l_item and then l_item.weight < a_edge.weight then
-					edge_list.put_right (a_edge)
+			check attached a_edge then
+				-- Note: This routine is necessary because `WEIGHTED_EDGE' cannot
+				-- inherit from `COMPARABLE' (failure of `is_equal' because of
+				-- trichotomy postcondition). Hence no sortable data structure can be used.
+				if edge_list.is_empty then
+					edge_list.extend (a_edge)
 				else
-					edge_list.put_left (a_edge)
+					-- Find insertion position for `edge_list' via binary search.
+					from
+						l := 1
+						r := edge_list.count
+					variant
+						r-l
+					until
+						r <= (l+1)
+					loop
+						p := (l+r) // 2
+						if attached edge_list.i_th (p) as l_item and then l_item.weight < a_edge.weight then
+							l := p
+						else
+							r := p
+						end
+					end
+
+					-- Decide whether to insert the new item at the left or right.
+					edge_list.go_i_th (l)
+					if attached edge_list.item as l_item and then l_item.weight < a_edge.weight then
+						edge_list.put_right (a_edge)
+					else
+						edge_list.put_left (a_edge)
+					end
 				end
 			end
 		end
