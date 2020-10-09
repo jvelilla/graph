@@ -170,7 +170,7 @@ feature -- Access
 		end
 
 		--edges: LIST [EDGE [like item,L]]
---	edges: detachable LIST [like edge_item]
+		--	edges: detachable LIST [like edge_item]
 	edges: LIST [like edge_item]
 			-- All edges of the graph
 		deferred
@@ -247,7 +247,7 @@ feature -- Access
 		require
 			path_found: path_found
 		do
-			check attached  path_impl as l_path_impl then
+			check attached path_impl as l_path_impl then
 				Result := l_path_impl
 			end
 		ensure
@@ -331,7 +331,7 @@ feature -- Measurement
 	components: INTEGER
 			-- Number of (weakly) connected components of the graph
 		local
-			--edge: like edge_item
+				--edge: like edge_item
 			node_list: like linear_representation
 				--			edge_list: LINEAR [like edge_item]
 			set_1, set_2: INTEGER
@@ -438,46 +438,44 @@ feature -- Status report
 		end
 
 		--edge_occurences (a_edge: EDGE [like item, L]): INTEGER
-	edge_occurences (a_edge: like edge_item): INTEGER
+	edge_occurences (a_edge: attached like edge_item): INTEGER
 			-- Number of times `a_edge' appears in the graph (object equality)
 		require
 			edge_not_void: a_edge /= Void
 		local
 			c: like cursor
 		do
-			check attached a_edge then
-					-- Make backup of cursor if necessary.
-				if not off then
-					c := cursor
-				end
+				-- Make backup of cursor if necessary.
+			if not off then
+				c := cursor
+			end
 
-				if attached a_edge then
-					search (a_edge.start_node)
-				end
+			if attached a_edge then
+				search (a_edge.start_node)
+			end
 
-				if off then
-						-- Edge is not part of the graph.
-					Result := 0
-				else
-						-- Iterate over all outgoing edges to find matches.
-					from
-						start
-					until
-						exhausted
-					loop
-						if attached edge_item as l_edge_item and then l_edge_item.is_equal (a_edge) then
-							Result := Result + 1
-						end
-						left
+			if off then
+					-- Edge is not part of the graph.
+				Result := 0
+			else
+					-- Iterate over all outgoing edges to find matches.
+				from
+					start
+				until
+					exhausted
+				loop
+					if attached edge_item as l_edge_item and then l_edge_item.is_equal (a_edge) then
+						Result := Result + 1
 					end
+					left
 				end
+			end
 
-					-- Restore cursor.
-				if c /= Void then
-					go_to (c)
-				else
-					invalidate_cursor
-				end
+				-- Restore cursor.
+			if c /= Void then
+				go_to (c)
+			else
+				invalidate_cursor
 			end
 		end
 
@@ -510,7 +508,6 @@ feature -- Status report
 			-- Does the graph contain cyclic (directed) paths?
 		local
 			topo_sorter: TOPOLOGICAL_SORTER [like item]
-			--e: like edge_item
 		do
 				-- Perform topological sort to find cycles in the graph.
 			create topo_sorter.make
@@ -520,14 +517,15 @@ feature -- Status report
 				until
 					el.after
 				loop
-					if attached  el.item as e then
+					if attached el.item as e then
 						topo_sorter.record_constraint (e.start_node, e.end_node)
 					end
 					el.forth
 				end
 				topo_sorter.process
 			end
-			Result := topo_sorter.cycle_found end
+			Result := topo_sorter.cycle_found
+		end
 
 	is_dag: BOOLEAN
 			-- Is the graph a DAG? (directed acyclic graph)

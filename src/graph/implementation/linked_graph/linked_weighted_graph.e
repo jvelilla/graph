@@ -4,10 +4,10 @@ note
 		dynamically linked structure.
 		Simple graphs, multigraphs, symmetric graphs
 		and symmetric multigraphs are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2010-06-28 20:14:26 +0200 (Пн, 28 июн 2010) $"
+	date: "$Date: 2010-06-28 20:14:26 +0200 (�%/159/н, 28 и�%/142/н 2010) $"
 	revision: "$Revision: 1133 $"
 
 class
@@ -20,7 +20,7 @@ inherit
 			put_unlabeled_edge as put_unweighted_unlabeled_edge,
 			edge_from_values as unweighted_edge_from_values
 		export {NONE}
-			put_unweighted_edge,
+ put_unweighted_edge,
 			put_unweighted_unlabeled_edge,
 			unweighted_edge_from_values
 		undefine
@@ -52,8 +52,8 @@ inherit
 			unweighted_edge_from_values,
 			forth,
 			out
---		redefine
---			border_nodes
+			--		redefine
+			--			border_nodes
 		end
 
 create
@@ -129,7 +129,8 @@ feature -- Element change
 		end
 
 feature -- Removal
-prune_edge (a_edge: EDGE [like item, L])
+
+	prune_edge (a_edge: EDGE [like item, L])
 			-- Remove `a_edge' from the graph.
 		local
 			linked_edge: like edge_item
@@ -139,7 +140,7 @@ prune_edge (a_edge: EDGE [like item, L])
 		do
 			prune_edge_impl (a_edge)
 			if is_symmetric_graph then
-				-- Find both start and end node in the node list.
+					-- Find both start and end node in the node list.
 				linked_edge ?= a_edge
 				if linked_edge /= Void then
 					start_node := linked_edge.internal_start_node
@@ -177,8 +178,8 @@ feature -- Output
 	out: STRING
 			-- Printable representation of the graph
 		local
-			-- node: like current_node
-			-- edge: like edge_item
+				-- node: like current_node
+				-- edge: like edge_item
 			i, index: INTEGER
 		do
 			Result := "digraph linked_weighted_graph%N"
@@ -193,7 +194,7 @@ feature -- Output
 					Result.append (node.item.out)
 					Result.append ("%";%N")
 					from
-						-- Store previous cursor position
+							-- Store previous cursor position
 						index := node.edge_list.index
 						node.edge_list.start
 					until
@@ -202,7 +203,7 @@ feature -- Output
 						Result.append ("  %"")
 						Result.append (node.item.out)
 						Result.append ("%" -> %"")
---						edge ?= node.edge_list.item
+							--						edge ?= node.edge_list.item
 						check attached {like edge_item} node.edge_list.item as edge then
 							Result.append (edge.end_node.out)
 							Result.append ("%" [label=%"")
