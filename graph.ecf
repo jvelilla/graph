@@ -2,13 +2,13 @@
 <system xmlns="http://www.eiffel.com/developers/xml/configuration-1-21-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-21-0 http://www.eiffel.com/developers/xml/configuration-1-21-0.xsd" name="graph" uuid="87919A08-C4D8-4487-95C6-EED010734FE8" library_target="graph">
 	<target name="graph">
 		<root all_classes="true"/>
-			<option warning="warning" manifest_array_type="mismatch_warning">
+		<option warning="warning" manifest_array_type="mismatch_warning">
 			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
 		</option>
 		<setting name="console_application" value="true"/>
 		<setting name="dead_code_removal" value="feature"/>
 		<capability>
-			<void_safety support="conformance" use="conformance"/>
+			<void_safety support="initialization" use="initialization"/>
 		</capability>
 		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
 		<library name="base_extension" location="$ISE_LIBRARY\library\base_extension\base_extension.ecf"/>

@@ -121,7 +121,7 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	last_inserted_edge: EDGE [G, L]
+	last_inserted_edge: detachable EDGE [G, L]
 			-- Edge that was created with the last put_..._edge command
 
 	cursor: GRAPH_CURSOR [G, L]
@@ -148,16 +148,18 @@ feature -- Access
 
 	target_cursor: like cursor
 			-- Cursor position for `target'
+		local
+			g: G
 		do
 			if off then
-				Result := Void
+				create Result.make (g, Void)
 			else
 				forth
 				create Result.make (item, edge_item)
 				back
 			end
 		ensure then
-			void_when_off: off = (Result = Void)
+			void_when_off: off = (Result.current_node = Void)
 		end
 
 	nodes, vertices: SET [like item]
@@ -244,7 +246,9 @@ feature -- Access
 		require
 			path_found: path_found
 		do
-			Result := path_impl
+			check attached  path_impl as l_path_impl then
+				Result := l_path_impl
+			end
 		ensure
 			path_not_void: Result /= Void
 		end
@@ -268,7 +272,9 @@ feature -- Access
 		require
 			merge_failed: not merge_succeeded
 		do
-			Result := conflicting_edges_impl
+			check attached conflicting_edges_impl as l_conflicting_edges_impl then
+				Result := l_conflicting_edges_impl
+			end
 		ensure
 			result_not_void: Result /= Void
 		end
@@ -1145,7 +1151,7 @@ feature {NONE} -- Implementation
 		deferred
 		end
 
-	conflicting_edges_impl: LINKED_LIST [like edge_item]
+	conflicting_edges_impl: detachable LINKED_LIST [like edge_item]
 			-- Edges that could not be unified with current graph
 			-- using the `merge_with' command.
 
@@ -1168,7 +1174,7 @@ feature {NONE} -- Implementation
 			-- All graph nodes annotated with additional information
 			-- for the path finding algorithm
 
-	border_nodes: INVERSE_HEAP_PRIORITY_QUEUE [NODE [like item, L]]
+	border_nodes: detachable INVERSE_HEAP_PRIORITY_QUEUE [NODE [like item, L]]
 			-- Nodes which are part of the border set in the path finding algorithm
 
 	node_from_item (a_item: like item): NODE [like item, L]

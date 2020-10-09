@@ -191,7 +191,7 @@ feature -- Obsolete
 
 feature {NONE} -- Inapplicable
 
-	put_unweighted_edge (a_start_node, a_end_node: like item; a_label: L)
+	put_unweighted_edge (a_start_node, a_end_node: like item; a_label: detachable L)
 			-- Not applicable anymore. Edges must be weighted.
 		do
 			-- Workaround for catcalls: Put unweighted edge instead.
