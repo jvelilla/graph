@@ -57,7 +57,7 @@ create
 
 feature -- Access
 
-	edge_item: WEIGHTED_EDGE [like item, L]
+	edge_item: detachable WEIGHTED_EDGE [like item, L]
 			-- Current edge
 		do
 			if current_target_node_index /= -1 then
@@ -182,8 +182,8 @@ feature -- Output
 						Result.append ("%" [label=%"")
 						label := edge.label
 						separate label as s_label do
-							if s_label /= Void and then not s_label.out.is_equal ("") then
-								Result.append (create {STRING}.make_from_separate (s_label.out))
+							if attached s_label as ls_label and then not ls_label.out.is_equal ("") then
+								Result.append (create {STRING}.make_from_separate (ls_label.out))
 								Result.append ("\n")
 							end
 						end

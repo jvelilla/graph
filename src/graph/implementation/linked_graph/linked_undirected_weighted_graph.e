@@ -54,7 +54,8 @@ inherit
 			is_dag,
 			is_connected,
 			is_eulerian,
-			out
+			out,
+			target
 		redefine
 			put_edge
 		end
