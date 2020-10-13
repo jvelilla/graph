@@ -34,7 +34,8 @@ inherit
 			put_edge,
 			degree,
 			prune_edge,
-			out
+			out,
+			target
 		end
 
 	UNDIRECTED_GRAPH [G, L]
@@ -59,6 +60,18 @@ create
 	make_simple_graph, make_multi_graph
 
 feature -- Access
+
+	target: like item
+			-- Item at the target of the current edge
+		do
+			check attached edge_item as l_item then
+				if l_item.end_node.is_equal (item) then
+					Result := l_item.start_node
+				else
+					Result := l_item.end_node
+				end
+			end
+		end
 
 feature -- Measurement
 
