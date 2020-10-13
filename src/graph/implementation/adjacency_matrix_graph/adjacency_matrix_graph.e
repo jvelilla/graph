@@ -547,7 +547,7 @@ feature -- Element change
 			internal_edges.extend (edge)
 			if is_symmetric_graph and not a_start_node.is_equal (a_end_node) then
 				create edge.make_directed (a_end_node, a_start_node, a_label)
-				adjacency_matrix.put (edge, start_index, end_index)
+				adjacency_matrix.put (edge, end_index, start_index)
 				internal_edges.extend (edge)
 			end
 
@@ -646,9 +646,9 @@ feature -- Removal
 			end
 
 				-- Adjust node indices if necessary.
-			if end_index = first_edge_index then
+			if not off and then end_index = first_edge_index then
 				find_first_edge_index
-			elseif end_index = last_edge_index then
+			elseif not off and then end_index = last_edge_index then
 				find_last_edge_index
 			end
 		end
@@ -740,7 +740,7 @@ feature -- Output
 							Result.append (node_array.item (j).out)
 							Result.append ("%"")
 
-							label := if attached  adjacency_matrix.item (i, j) as l_item then l_item.label else label end
+							label := if attached adjacency_matrix.item (i, j) as l_item then l_item.label else label end
 							separate label as s_label do
 								if attached s_label as ls_label and then not ls_label.out.is_equal ("") then
 									Result.append (" [label=%"")
