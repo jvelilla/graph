@@ -88,10 +88,10 @@ feature -- Access
 	weight: REAL_64
 			-- Weight of the edge
 		do
-			if not user_defined_weight_function then
-				Result := internal_weight
+			if attached weight_function as l_weight_function then
+				Result := l_weight_function.item ([Current])
 			else
-				Result := weight_function.item ([Current])
+				Result := internal_weight
 			end
 		end
 
@@ -201,7 +201,7 @@ feature {NONE} -- Implementation
 	internal_weight: REAL_64
 			-- Weight of the edge
 
-	weight_function: FUNCTION [TUPLE [WEIGHTED_EDGE [G, L]], REAL_64]
+	weight_function: detachable FUNCTION [TUPLE [WEIGHTED_EDGE [G, L]], REAL_64]
 			-- User-defined function to compute `weight'.
 
 end -- class WEIGHTED_EDGE

@@ -121,7 +121,7 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	last_inserted_edge: EDGE [G, L]
+	last_inserted_edge: detachable EDGE [G, L]
 			-- Edge that was created with the last put_..._edge command
 
 	cursor: GRAPH_CURSOR [G, L]
@@ -148,16 +148,18 @@ feature -- Access
 
 	target_cursor: like cursor
 			-- Cursor position for `target'
+		local
+			g: G
 		do
 			if off then
-				Result := Void
+				create Result.make (g, Void)
 			else
 				forth
 				create Result.make (item, edge_item)
 				back
 			end
 		ensure then
-			void_when_off: off = (Result = Void)
+			void_when_off: off = (Result.current_node = Void)
 		end
 
 	nodes, vertices: SET [like item]
@@ -168,7 +170,8 @@ feature -- Access
 		end
 
 		--edges: LIST [EDGE [like item,L]]
-	edges: detachable LIST [like edge_item]
+--	edges: detachable LIST [like edge_item]
+	edges: LIST [like edge_item]
 			-- All edges of the graph
 		deferred
 		ensure
@@ -244,7 +247,9 @@ feature -- Access
 		require
 			path_found: path_found
 		do
-			Result := path_impl
+			check attached  path_impl as l_path_impl then
+				Result := l_path_impl
+			end
 		ensure
 			path_not_void: Result /= Void
 		end
@@ -268,7 +273,9 @@ feature -- Access
 		require
 			merge_failed: not merge_succeeded
 		do
-			Result := conflicting_edges_impl
+			check attached conflicting_edges_impl as l_conflicting_edges_impl then
+				Result := l_conflicting_edges_impl
+			end
 		ensure
 			result_not_void: Result /= Void
 		end
@@ -324,7 +331,7 @@ feature -- Measurement
 	components: INTEGER
 			-- Number of (weakly) connected components of the graph
 		local
-			edge: like edge_item
+			--edge: like edge_item
 			node_list: like linear_representation
 				--			edge_list: LINEAR [like edge_item]
 			set_1, set_2: INTEGER
@@ -350,11 +357,12 @@ feature -- Measurement
 				until
 					edge_list.after
 				loop
-					edge := edge_list.item
-					set_1 := uf.find (edge.start_node)
-					set_2 := uf.find (edge.end_node)
-					if set_1 /= set_2 then
-						uf.union (set_1, set_2)
+					if attached edge_list.item as edge then
+						set_1 := uf.find (edge.start_node)
+						set_2 := uf.find (edge.end_node)
+						if set_1 /= set_2 then
+							uf.union (set_1, set_2)
+						end
 					end
 					edge_list.forth
 				end
@@ -453,7 +461,7 @@ feature -- Status report
 				until
 					exhausted
 				loop
-					if edge_item.is_equal (a_edge) then
+					if attached edge_item as l_edge_item and then l_edge_item.is_equal (a_edge) then
 						Result := Result + 1
 					end
 					left
@@ -497,7 +505,7 @@ feature -- Status report
 			-- Does the graph contain cyclic (directed) paths?
 		local
 			topo_sorter: TOPOLOGICAL_SORTER [like item]
-			e: like edge_item
+			--e: like edge_item
 		do
 				-- Perform topological sort to find cycles in the graph.
 			create topo_sorter.make
@@ -507,8 +515,9 @@ feature -- Status report
 				until
 					el.after
 				loop
-					e := el.item
-					topo_sorter.record_constraint (e.start_node, e.end_node)
+					if attached  el.item as e then
+						topo_sorter.record_constraint (e.start_node, e.end_node)
+					end
 					el.forth
 				end
 				topo_sorter.process
@@ -969,71 +978,73 @@ feature -- Basic operations
 
 				-- Initialize data structure to keep track of half- or fully processed nodes.
 			prepare_path_finding
-			target_node := node_from_item (a_end_node)
+			check attached border_nodes as l_border_nodes then
+				target_node := node_from_item (a_end_node)
 
-				-- Main algorithm: Explore reachable node set with breadth-first strategy.
-				-- Continue exploring from node with minimal distance from start node.
-				-- If a node is reached faster than before, update its distance
-				-- and store the edge where we came from.
-			from
-					-- Initialize start node.
-				node := node_from_item (a_start_node)
-				node.set_referrer (Void, Void, 0)
-				border_nodes.put (node)
-			until
-				border_nodes.is_empty or target_node.processed
-			loop
-					-- Get node with minimal distance
-				node := border_nodes.item
-				border_nodes.remove
-				node.set_processed
-
-					-- Put all items reachable from current node into `border_nodes'.
-				search (node.item)
+					-- Main algorithm: Explore reachable node set with breadth-first strategy.
+					-- Continue exploring from node with minimal distance from start node.
+					-- If a node is reached faster than before, update its distance
+					-- and store the edge where we came from.
 				from
-					el := incident_edges
-					el.start
+						-- Initialize start node.
+					node := node_from_item (a_start_node)
+					node.set_referrer (Void, Void, 0)
+					l_border_nodes.put (node)
 				until
-					el.after
+					l_border_nodes.is_empty or target_node.processed
 				loop
-					focused_item := opposite_node (el.item, node.item)
-					focused_node := node_from_item (focused_item)
-					dist := node.distance + edge_length (el.item)
-					if dist < focused_node.distance then
-							-- Focused node has been reached faster than ever before:
-							-- Update its distance and keep track of the referring edge.
-						focused_node.set_referrer (node, el.item, dist)
-						border_nodes.put (focused_node)
+						-- Get node with minimal distance
+					node := l_border_nodes.item
+					l_border_nodes.remove
+					node.set_processed
+
+						-- Put all items reachable from current node into `border_nodes'.
+					search (node.item)
+					from
+						el := incident_edges
+						el.start
+					until
+						el.after
+					loop
+						focused_item := opposite_node (el.item, node.item)
+						focused_node := node_from_item (focused_item)
+						dist := node.distance + edge_length (el.item)
+						if dist < focused_node.distance then
+								-- Focused node has been reached faster than ever before:
+								-- Update its distance and keep track of the referring edge.
+							focused_node.set_referrer (node, el.item, dist)
+							l_border_nodes.put (focused_node)
+						end
+						el.forth
 					end
-					el.forth
 				end
-			end
 
-			set_path_found (target_node.processed)
+				set_path_found (target_node.processed)
 
-			if path_found then
-					-- We have found a path connecting `a_start_node' and `a_end_node'.
-					-- Follow the referrer edges to build up the path
-					-- (traverse path in reverse order until the start node is reached).
-				from
-					create path_impl.make
-					node := target_node
-					it := a_end_node
-				until
-					node.referring_edge = Void
-				loop
-					if attached {like edge_item} node.referring_edge as e then
-							-- Flip edges if necessary to make the output meaningful.
-						if not it.is_equal (e.end_node) then
-								-- This can only happen in case of undirected edges.
-							e.flip
+				if path_found then
+						-- We have found a path connecting `a_start_node' and `a_end_node'.
+						-- Follow the referrer edges to build up the path
+						-- (traverse path in reverse order until the start node is reached).
+					from
+						create path_impl.make
+						node := target_node
+						it := a_end_node
+					until
+						attached node as l_node and then l_node.referring_edge = Void
+					loop
+						if attached node as l_node and then attached {like edge_item} l_node.referring_edge as e then
+								-- Flip edges if necessary to make the output meaningful.
+							if not it.is_equal (e.end_node) then
+									-- This can only happen in case of undirected edges.
+								e.flip
+							end
+
+							if attached path_impl as l_path_impl then
+								l_path_impl.put_front (e)
+							end
+							node := l_node.referring_node
+							it := e.start_node
 						end
-
-						if attached path_impl as l_path_impl then
-							l_path_impl.put_front (e)
-						end
-						node := node.referring_node
-						it := e.start_node
 					end
 				end
 			end
@@ -1145,7 +1156,7 @@ feature {NONE} -- Implementation
 		deferred
 		end
 
-	conflicting_edges_impl: LINKED_LIST [like edge_item]
+	conflicting_edges_impl: detachable LINKED_LIST [like edge_item]
 			-- Edges that could not be unified with current graph
 			-- using the `merge_with' command.
 
@@ -1168,7 +1179,7 @@ feature {NONE} -- Implementation
 			-- All graph nodes annotated with additional information
 			-- for the path finding algorithm
 
-	border_nodes: INVERSE_HEAP_PRIORITY_QUEUE [NODE [like item, L]]
+	border_nodes: detachable INVERSE_HEAP_PRIORITY_QUEUE [NODE [like item, L]]
 			-- Nodes which are part of the border set in the path finding algorithm
 
 	node_from_item (a_item: like item): NODE [like item, L]
@@ -1178,8 +1189,10 @@ feature {NONE} -- Implementation
 		local
 			index: INTEGER
 		do
-			index := index_of_element.item (a_item)
-			Result := annotated_nodes.item (index)
+			check attached annotated_nodes as l_annotated_nodes then
+				index := index_of_element.item (a_item)
+				Result := l_annotated_nodes.item (index)
+			end
 		ensure
 			result_not_void: Result /= Void
 		end
@@ -1222,7 +1235,9 @@ feature {NONE} -- Implementation
 	opposite_node (a_edge: like edge_item; a_node: like item): like item
 			-- End node of `a_edge' when `a_node' is the start node
 		do
-			Result := a_edge.end_node
+			check attached a_edge as l_edge then
+				Result := l_edge.end_node
+			end
 		end
 
 	edge_length (a_edge: like edge_item): REAL_64
@@ -1294,13 +1309,14 @@ feature {NONE} -- Implementation
 			simple_graph: is_simple_graph
 		local
 			edge_linear: like edges
+			l_conflicting_edges_impl: like conflicting_edges_impl
 		do
 				-- Merge edges of `other' into current graph.
 				-- Only edges preserving the simple graph property are processed.
 			from
 				edge_linear := other.edges
 				edge_linear.start
-				create conflicting_edges_impl.make
+				create l_conflicting_edges_impl.make
 			until
 				edge_linear.after
 			loop
@@ -1309,11 +1325,12 @@ feature {NONE} -- Implementation
 						adopt_edge (e)
 					else
 						set_merge_succeeded (False)
-						conflicting_edges_impl.extend (e)
+						l_conflicting_edges_impl.extend (e)
 					end
 				end
 				edge_linear.forth
 			end
+			conflicting_edges_impl := l_conflicting_edges_impl
 		ensure
 			conflict: not merge_succeeded implies conflicting_edges.count > 0
 			edge_count: edge_count >= old edge_count

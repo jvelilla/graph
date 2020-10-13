@@ -78,7 +78,9 @@ feature -- Measurement
 	degree: INTEGER
 			-- Number of edges attached to `item'
 		do
-			Result := current_node.out_degree
+			if attached current_node as l_current_node then
+				Result := l_current_node.out_degree
+			end
 		end
 
 feature -- Status report
@@ -91,7 +93,7 @@ feature -- Status report
 			--			el: TWO_WAY_CIRCULAR [like edge_item]
 		do
 			start_node := linked_node_from_item (a_start_node)
-			if attached {TWO_WAY_CIRCULAR [like edge_item]} start_node.edge_list as el then
+			if attached start_node as l_start_node and then attached {TWO_WAY_CIRCULAR [like edge_item]} l_start_node.edge_list as el then
 
 					-- Make backup of cursor.
 				index := el.index
@@ -101,7 +103,7 @@ feature -- Status report
 				until
 					Result or el.exhausted
 				loop
-					if el.item.opposite_node (a_start_node).is_equal (a_end_node) then
+					if attached el.item as l_item  and then l_item.opposite_node (a_start_node).is_equal (a_end_node) then
 						Result := True
 					end
 					el.forth
@@ -166,7 +168,7 @@ feature -- Removal
 			end
 
 				-- Turn cursor if `edge_item' is removed.
-			if (not off) and then attached edge_item as l_edge_item and then linked_edge.is_equal (l_edge_item) then
+			if (not off) and then attached edge_item as l_edge_item and then attached linked_edge as l_linked_edge and then linked_edge.is_equal (l_edge_item) then
 				right
 			end
 
@@ -180,19 +182,23 @@ feature -- Removal
 				-- Note: End node must be processed first.
 				-- Otherwise, `turn_to_edge' produces contract violation.
 			current_node := end_node
-			index := current_node.edge_list.index
-			turn_to_edge (a_edge)
-			current_node.edge_list.remove
-			if current_node.edge_list.valid_index (index) then
-				current_node.edge_list.go_i_th (index)
+			if attached current_node as l_current_node then
+				index := l_current_node.edge_list.index
+				turn_to_edge (a_edge)
+				l_current_node.edge_list.remove
+				if l_current_node.edge_list.valid_index (index) then
+					l_current_node.edge_list.go_i_th (index)
+				end
 			end
 
 			current_node := start_node
-			index := current_node.edge_list.index
-			turn_to_edge (a_edge)
-			current_node.edge_list.remove
-			if current_node.edge_list.valid_index (index) then
-				current_node.edge_list.go_i_th (index)
+			if attached current_node as l_current_node then
+				index := l_current_node.edge_list.index
+				turn_to_edge (a_edge)
+				l_current_node.edge_list.remove
+				if l_current_node.edge_list.valid_index (index) then
+					l_current_node.edge_list.go_i_th (index)
+				end
 			end
 
 			if attached {like edge_item} linked_edge as l_linked_edge and then attached {ARRAYED_LIST [like edge_item]} internal_edges as l_internal_edges and then l_internal_edges.has (l_linked_edge) then
@@ -230,7 +236,7 @@ feature -- Output
 			-- Textual representation of the graph
 		local
 			i, index: INTEGER
-			node: like current_node
+			--node: like current_node
 			edge: like edge_item
 			edges_todo: like edges
 		do
@@ -245,37 +251,38 @@ feature -- Output
 			until
 				i > node_count
 			loop
-				node := node_list.item (i)
-				Result.append ("%"")
-				Result.append (node.item.out)
-				Result.append ("%";%N")
-				from
-					index := node.edge_list.index
-					node.edge_list.start
-				until
-					node.edge_list.exhausted
-				loop
-					edge := node.edge_list.item
-					if edges_todo.has (edge) then
-						Result.append ("  %"")
-						Result.append (node.item.out)
-						Result.append ("%" -- %"")
-						Result.append (edge.opposite_node (node.item).out)
-						Result.append ("%"")
+				if attached  node_list.item (i)  as node then
+					Result.append ("%"")
+					Result.append (node.item.out)
+					Result.append ("%";%N")
+					from
+						index := node.edge_list.index
+						node.edge_list.start
+					until
+						node.edge_list.exhausted
+					loop
+						edge := node.edge_list.item
+						if edges_todo.has (edge) then
+							Result.append ("  %"")
+							Result.append (node.item.out)
+							Result.append ("%" -- %"")
+							Result.append (edge.opposite_node (node.item).out)
+							Result.append ("%"")
 
-						if attached {ANY} node.edge_list.item.label as label and then label /= Void and then not label.out.is_equal ("") then
-							Result.append (" [label=%"")
-							Result.append (label.out)
-							Result.append ("%"]")
+							if attached {ANY} node.edge_list.item.label as label and then label /= Void and then not label.out.is_equal ("") then
+								Result.append (" [label=%"")
+								Result.append (label.out)
+								Result.append ("%"]")
+							end
+							Result.append (";%N")
+							edges_todo.start
+							edges_todo.prune (edge)
 						end
-						Result.append (";%N")
-						edges_todo.start
-						edges_todo.prune (edge)
+						node.edge_list.forth
 					end
-					node.edge_list.forth
-				end
-				if node.edge_list.valid_index (index) then
-					node.edge_list.go_i_th (index)
+					if node.edge_list.valid_index (index) then
+						node.edge_list.go_i_th (index)
+					end
 				end
 				i := i + 1
 			end

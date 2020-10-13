@@ -130,7 +130,7 @@ feature -- Access
 			loop
 					----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 				debug ("incident_edges")
-					print (adjacency_matrix.item (current_node_index, i).out + "%N")
+					print (if attached adjacency_matrix.item (current_node_index, i) as l_item then l_item.out else "" end + "%N")
 				end
 					----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 				if attached adjacency_matrix.item (current_node_index, i) as l_item then
@@ -158,7 +158,7 @@ feature -- Access
 			until
 				(i = -1) or (i > last_edge_index)
 			loop
-				if attached adjacency_matrix.item (current_node_index, i).label as l_label then
+				if attached adjacency_matrix.item (current_node_index, i) as l_item and then attached l_item.label as l_label then
 					Result.extend (l_label)
 				end
 
@@ -739,11 +739,12 @@ feature -- Output
 							Result.append ("%" -> %"")
 							Result.append (node_array.item (j).out)
 							Result.append ("%"")
-							label := adjacency_matrix.item (i, j).label
+
+							label := if attached  adjacency_matrix.item (i, j) as l_item then l_item.label else label end
 							separate label as s_label do
-								if s_label /= Void and then not s_label.out.is_equal ("") then
+								if attached s_label as ls_label and then not ls_label.out.is_equal ("") then
 									Result.append (" [label=%"")
-									Result.append (create {STRING}.make_from_separate (s_label.out))
+									Result.append (create {STRING}.make_from_separate (ls_label.out))
 									Result.append ("%"]")
 								end
 							end

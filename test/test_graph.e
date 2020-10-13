@@ -77,7 +77,9 @@ feature -- Test routines
 			end
 
 			across l_graph.path as ic loop
-				print (ic.item.out)
+				if attached ic.item as l_item then
+					print (l_item.out)
+				end
 			end
 
 				-- BFS walker
@@ -170,7 +172,9 @@ feature -- Test routines
 			end
 
 			across l_graph.path as ic loop
-				print (ic.item.out)
+				if attached ic.item as l_item then
+					print (l_item.out)
+				end
 			end
 
 				-- BFS walker
@@ -257,7 +261,9 @@ feature -- Test routines
 			end
 
 			across l_graph.path as ic loop
-				print (ic.item.out)
+				if attached ic.item as l_item then
+					print (l_item.out)
+				end
 			end
 
 				-- BFS walker
