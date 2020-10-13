@@ -29,7 +29,7 @@ create
 
 feature -- Initialization
 
-	make (a_start_node, a_end_node: G; a_label: L; a_weight: REAL_64)
+	make (a_start_node, a_end_node: G; a_label: detachable L; a_weight: REAL_64)
 			-- Make a labeled edge from two nodes with weight `a_weight'.
 		require
 			nodes_not_void: a_start_node /= Void and a_end_node /= Void
@@ -49,7 +49,7 @@ feature -- Initialization
 			default_weight_function: not user_defined_weight_function
 		end
 
-	make_directed (a_start_node, a_end_node: G; a_label: L; a_weight: REAL_64)
+	make_directed (a_start_node, a_end_node: G; a_label: detachable L; a_weight: REAL_64)
 			-- Make a directed labeled edge from two nodes with weight `a_weight'.
 		require
 			nodes_not_void: a_start_node /= Void and a_end_node /= Void
@@ -66,7 +66,7 @@ feature -- Initialization
 			is_directed: is_directed
 		end
 
-	make_undirected (a_start_node, a_end_node: G; a_label: L; a_weight: REAL_64)
+	make_undirected (a_start_node, a_end_node: G; a_label: detachable L; a_weight: REAL_64)
 			-- Make an undirected labeled edge from two nodes with weight `a_weight'.
 		require
 			nodes_not_void: a_start_node /= Void and a_end_node /= Void
