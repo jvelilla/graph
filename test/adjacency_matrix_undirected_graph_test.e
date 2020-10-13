@@ -1,11 +1,11 @@
 ﻿note
-	description: "Summary description for {LINKED_UNDIRECTED_GRAPH_TEST}."
+	description: "Summary description for {ADJACENCY_MATRIX_UNDIRECTED_GRAPH_TEST}."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
 
 class
-	LINKED_UNDIRECTED_GRAPH_TEST
+	ADJACENCY_MATRIX_UNDIRECTED_GRAPH_TEST
 
 inherit
 	EQA_TEST_SET
@@ -14,9 +14,9 @@ feature -- Test routines
 
 	test_prune_edge_simple_graph
 		local
-			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, STRING]
-			l_nodes: SET [like {LINKED_UNDIRECTED_GRAPH [STRING, STRING]}.item]
-			l_edges: LIST [like {LINKED_UNDIRECTED_GRAPH [STRING, STRING]}.edge_item]
+			l_graph: ADJACENCY_MATRIX_UNDIRECTED_GRAPH [STRING, STRING]
+			l_nodes: SET [like {ADJACENCY_MATRIX_UNDIRECTED_GRAPH [STRING, STRING]}.item]
+			l_edges: LIST [like {ADJACENCY_MATRIX_UNDIRECTED_GRAPH [STRING, STRING]}.edge_item]
 			l_incident_labels: LIST [STRING]
 			l_neighbors: SET [STRING]
 		do
@@ -36,12 +36,11 @@ feature -- Test routines
 			l_graph.search ("b")
 			assert ("Expected in_degree (b)", l_graph.degree = 1)
 
-
-			create {ARRAYED_LIST [like {LINKED_GRAPH [STRING, STRING]}.edge_item]} l_edges.make (1)
+			create {ARRAYED_LIST [like {ADJACENCY_MATRIX_UNDIRECTED_GRAPH [STRING, STRING]}.edge_item]} l_edges.make (1)
 			l_edges.compare_objects
-			l_edges.force (create {LINKED_GRAPH_EDGE [STRING, STRING]}.make_directed (create {LINKED_GRAPH_NODE [STRING, STRING]}.make ("a"), create {LINKED_GRAPH_NODE [STRING, STRING]}.make ("b"), "a-b"))
+			l_edges.force (create {EDGE [STRING, STRING]}.make_undirected ("a", "b", "a-b"))
 
-			if attached {like {LINKED_UNDIRECTED_GRAPH [STRING, STRING]}.edges} l_graph.edges as l_graph_edges then
+			if attached l_graph.edges as l_graph_edges then
 				l_graph_edges.compare_objects
 				assert ("All edges exist", ∀ e: l_graph_edges ¦ l_edges.has (e))
 			end
@@ -88,7 +87,7 @@ feature -- Test routines
 
 	test_prune_edge_simple_graph_2
 		local
-			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, STRING]
+			l_graph: ADJACENCY_MATRIX_UNDIRECTED_GRAPH [STRING, STRING]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -107,26 +106,6 @@ feature -- Test routines
 			assert ("Has edge a-b", l_graph.has_edge_between ("a", "b"))
 			l_graph.prune_edge_between ("a", "b")
 			assert ("Not has edge a-b", not l_graph.has_edge_between ("a", "b"))
-		end
-
-	test_prune_edge_multi_graph
-		local
-			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, STRING]
-		do
-				-- Create the graph
-			create l_graph.make_multi_graph
-
-				-- Put the nodes into the graph.
-			l_graph.put_node ("a")
-			l_graph.put_node ("b")
-			l_graph.put_unlabeled_edge ("a", "b")
-			l_graph.put_unlabeled_edge ("a", "b")
-			assert ("Has edge a-b", l_graph.has_edge_between ("a", "b"))
-			assert ("Has 2 edges", l_graph.edge_count = 2)
-			if attached l_graph.edges.at (1) as l_edge then
-				l_graph.prune_edge (l_edge)
-				assert ("Has 1 edges", l_graph.edge_count = 1)
-			end
 		end
 
 end
