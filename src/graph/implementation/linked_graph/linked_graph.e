@@ -258,8 +258,8 @@ feature -- Status report
 			node: like current_node
 			index: INTEGER
 		do
-			linked_graph_edge ?= a_edge
-			if linked_graph_edge /= Void then
+			if attached {like edge_item} a_edge as l_edge then
+				linked_graph_edge := l_edge
 				node := linked_graph_edge.internal_start_node
 			else
 				node := linked_node_from_item (a_edge.start_node)
@@ -550,7 +550,7 @@ feature -- Removal
 			prune_edge_impl (a_edge)
 			if is_symmetric_graph then
 					-- Find both start and end node in the node list.
-				linked_edge ?= a_edge
+				linked_edge := if attached {like edge_item} a_edge as l_edge then l_edge else Void  end
 				if linked_edge /= Void then
 					start_node := linked_edge.internal_start_node
 					end_node := linked_edge.internal_end_node

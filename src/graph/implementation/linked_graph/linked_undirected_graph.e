@@ -17,7 +17,7 @@ inherit
 			in_degree as degree,
 			out_degree as degree
 		export {NONE}
-			is_dag
+			 is_dag
 		undefine
 			adopt_edge,
 			components,
@@ -35,6 +35,7 @@ inherit
 			degree,
 			prune_edge,
 			out,
+			neighbors,
 			target
 		end
 
@@ -53,6 +54,7 @@ inherit
 			degree,
 			node_count,
 			forth,
+			neighbors,
 			out
 		end
 
@@ -65,6 +67,14 @@ feature -- Access
 			-- Item at the target of the current edge
 		do
 			check attached edge_item as l_item then
+				Result := l_item.end_node
+			end
+		end
+
+
+	target_undirected: like item
+		do
+			check attached edge_item as l_item then
 				if l_item.end_node.is_equal (item) then
 					Result := l_item.start_node
 				else
@@ -72,6 +82,30 @@ feature -- Access
 				end
 			end
 		end
+
+
+	neighbors: SET [like item]
+			-- All neighbor nodes of `item'
+		local
+			c: like cursor
+		do
+				-- Backup cursor
+			c := cursor
+
+			create {LINKED_SET [like item]} Result.make
+			from
+				start
+			until
+				exhausted
+			loop
+				Result.put (target_undirected)
+				left
+			end
+
+				-- Restore cursor.
+			go_to (c)
+		end
+
 
 feature -- Measurement
 
@@ -103,7 +137,7 @@ feature -- Status report
 				until
 					Result or el.exhausted
 				loop
-					if attached el.item as l_item  and then l_item.opposite_node (a_start_node).is_equal (a_end_node) then
+					if attached el.item as l_item and then l_item.opposite_node (a_start_node).is_equal (a_end_node) then
 						Result := True
 					end
 					el.forth
@@ -153,10 +187,9 @@ feature -- Removal
 			c: like cursor
 			index: INTEGER
 		do
-			linked_edge ?= a_edge
-
 				-- Find both start and end node in the node list.
-			if linked_edge /= Void then
+			if attached {LINKED_GRAPH_EDGE [like item, L]} a_edge as l_edge then
+				linked_edge := l_edge
 				start_node := linked_edge.internal_start_node
 				end_node := linked_edge.internal_end_node
 			else
@@ -236,7 +269,7 @@ feature -- Output
 			-- Textual representation of the graph
 		local
 			i, index: INTEGER
-			--node: like current_node
+				--node: like current_node
 			edge: like edge_item
 			edges_todo: like edges
 		do
@@ -251,7 +284,7 @@ feature -- Output
 			until
 				i > node_count
 			loop
-				if attached  node_list.item (i)  as node then
+				if attached node_list.item (i) as node then
 					Result.append ("%"")
 					Result.append (node.item.out)
 					Result.append ("%";%N")

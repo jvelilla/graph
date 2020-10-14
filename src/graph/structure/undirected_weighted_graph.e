@@ -231,8 +231,6 @@ feature {NONE} -- Implementation
 					from
 						l := 1
 						r := edge_list.count
-					variant
-						r-l
 					until
 						r <= (l+1)
 					loop
@@ -242,6 +240,8 @@ feature {NONE} -- Implementation
 						else
 							r := p
 						end
+					variant
+						r-l
 					end
 
 					-- Decide whether to insert the new item at the left or right.

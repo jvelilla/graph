@@ -68,7 +68,7 @@ feature -- Access
 			-- Current edge
 		do
 			if attached current_node as l_current_node and then not l_current_node.edge_list.off then
-				Result ?= l_current_node.edge_list.item
+				Result := if attached {LINKED_GRAPH_WEIGHTED_EDGE [like item, L]} l_current_node.edge_list.item as l_result then l_result else Void end
 			else
 				Result := Void
 			end
@@ -141,7 +141,7 @@ feature -- Removal
 			prune_edge_impl (a_edge)
 			if is_symmetric_graph then
 					-- Find both start and end node in the node list.
-				linked_edge ?= a_edge
+				linked_edge := if attached {like edge_item} a_edge as l_edge then  l_edge else Void end
 				if linked_edge /= Void then
 					start_node := linked_edge.internal_start_node
 					end_node := linked_edge.internal_end_node

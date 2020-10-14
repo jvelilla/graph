@@ -207,8 +207,8 @@ feature {NONE} -- Inapplicable
 			-- Result is Void if there is no match.
 			-- The cursor is not moved.
 		do
-			-- Workaround for catcalls: Get unweighted edge instead.
-			Result ?= edge_from_values (a_start_node, a_end_node, a_label, 0)
+				-- Workaround for catcalls: Get unweighted edge instead.
+			Result := if attached {EDGE [like item, L]} edge_from_values (a_start_node, a_end_node, a_label, 0) as l_result then l_result else Void end
 		end
 
 feature {NONE} -- Implementation

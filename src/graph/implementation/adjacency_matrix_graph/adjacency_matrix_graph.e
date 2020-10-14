@@ -674,7 +674,7 @@ feature -- Miscellaneous
 		do
 			if not inactive_nodes.is_empty then
 					-- Make new adjacency matrix and node array.
-				create new_matrix.make (node_count, node_count)
+				create new_matrix.make_filled (Void, node_count, node_count)
 				create new_node_array.make (1, node_count)
 				from
 					i := 1

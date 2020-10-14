@@ -1206,7 +1206,6 @@ feature {NONE} -- Implementation
 			lin_rep: like linear_representation
 			it: like item
 			node: NODE [like item, L]
-			index: INTEGER
 			l_annotated_nodes: ARRAYED_LIST [NODE [like item, L]]
 		do
 
