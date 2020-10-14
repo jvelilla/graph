@@ -35,6 +35,7 @@ inherit
 			degree,
 			prune_edge,
 			out,
+			neighbors,
 			target
 		end
 
@@ -53,6 +54,7 @@ inherit
 			degree,
 			node_count,
 			forth,
+			neighbors,
 			out
 		end
 
@@ -65,6 +67,13 @@ feature -- Access
 			-- Item at the target of the current edge
 		do
 			check attached edge_item as l_item then
+					Result := l_item.end_node
+			end
+		end
+
+	target_undirected: like item
+		do
+			check attached edge_item as l_item then
 				if l_item.end_node.is_equal (item) then
 					Result := l_item.start_node
 				else
@@ -72,6 +81,30 @@ feature -- Access
 				end
 			end
 		end
+
+
+	neighbors: SET [like item]
+			-- All neighbor nodes of `item'
+		local
+			c: like cursor
+		do
+				-- Backup cursor
+			c := cursor
+
+			create {LINKED_SET [like item]} Result.make
+			from
+				start
+			until
+				exhausted
+			loop
+				Result.put (target_undirected)
+				left
+			end
+
+				-- Restore cursor.
+			go_to (c)
+		end
+
 
 feature -- Measurement
 

@@ -418,7 +418,6 @@ feature -- Cursor movement
 				current_node := l_edge_item.internal_end_node
 				start
 			end
-
 		end
 
 	search (a_item: like item)
