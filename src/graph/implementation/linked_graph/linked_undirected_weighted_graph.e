@@ -3,10 +3,10 @@ note
 		Undirected weighted graphs, implemented as
 		dynamically linked structure.
 		Both simple graphs and multigraphs are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2010-06-28 20:14:26 +0200 (Пн, 28 июн 2010) $"
+	date: "$Date: 2010-06-28 20:14:26 +0200 (�%/159/н, 28 и�%/142/н 2010) $"
 	revision: "$Revision: 1133 $"
 
 class
@@ -19,7 +19,7 @@ inherit
 			put_unlabeled_edge as put_unweighted_unlabeled_edge,
 			edge_from_values as unweighted_edge_from_values
 		export {NONE}
-			unweighted_edge_from_values,
+ 			unweighted_edge_from_values,
 			put_unweighted_edge,
 			put_unweighted_unlabeled_edge
 		undefine
@@ -37,7 +37,7 @@ inherit
 			in_degree as degree,
 			out_degree as degree
 		export {NONE}
-			is_dag
+ 			is_dag
 		undefine
 			adopt_edge,
 			components,
@@ -116,7 +116,6 @@ feature -- Element change
 			end
 		end
 
-
 feature -- Removal
 
 feature -- Resizing
@@ -141,8 +140,8 @@ feature -- Output
 			-- Textual representation of the graph
 		local
 			i, index: INTEGER
-			-- node: like current_node
-			-- edge: like edge_item
+				-- node: like current_node
+				-- edge: like edge_item
 			edges_todo: like edges
 		do
 			Result := "graph linked_undirected_graph%N"

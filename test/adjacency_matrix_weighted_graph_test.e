@@ -74,5 +74,6 @@ feature -- Test routines
 			assert ("has edge a-b", not l_graph.has_edge_between ("b", "a"))
 		end
 
+
 end
 
