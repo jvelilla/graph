@@ -646,10 +646,12 @@ feature -- Removal
 			end
 
 				-- Adjust node indices if necessary.
-			if not off and then end_index = first_edge_index then
+			if not off and then start_index = first_edge_index then
 				find_first_edge_index
+				current_target_node_index := first_edge_index
 			elseif not off and then end_index = last_edge_index then
 				find_last_edge_index
+				current_target_node_index := last_edge_index
 			end
 		end
 
@@ -676,6 +678,8 @@ feature -- Miscellaneous
 					-- Make new adjacency matrix and node array.
 				create new_matrix.make_filled (Void, node_count, node_count)
 				create new_node_array.make (1, node_count)
+
+
 				from
 					i := 1
 					new_i := i

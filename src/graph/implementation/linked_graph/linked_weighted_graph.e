@@ -68,7 +68,7 @@ feature -- Access
 			-- Current edge
 		do
 			if attached current_node as l_current_node and then not l_current_node.edge_list.off then
-				Result := if attached {LINKED_GRAPH_WEIGHTED_EDGE [like item, L]} l_current_node.edge_list.item as l_result then l_result else Void end
+				Result := {LINKED_GRAPH_WEIGHTED_EDGE [like item, L]} / l_current_node.edge_list.item
 			else
 				Result := Void
 			end
