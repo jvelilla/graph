@@ -55,7 +55,8 @@ inherit
 			is_connected,
 			is_eulerian,
 			out,
-			target
+			target,
+			neighbors
 		redefine
 			put_edge
 		end
@@ -78,6 +79,7 @@ inherit
 			edge_count,
 			put_unweighted_edge,
 			forth,
+			neighbors,
 			out
 		end
 
