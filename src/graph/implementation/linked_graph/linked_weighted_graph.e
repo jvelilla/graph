@@ -11,7 +11,7 @@ note
 	revision: "$Revision: 1133 $"
 
 class
-	LINKED_WEIGHTED_GRAPH [G -> HASHABLE, reference L]
+	LINKED_WEIGHTED_GRAPH [G -> HASHABLE, L]
 
 inherit
 	LINKED_GRAPH [G, L]
@@ -20,7 +20,7 @@ inherit
 			put_unlabeled_edge as put_unweighted_unlabeled_edge,
 			edge_from_values as unweighted_edge_from_values
 		export {NONE}
-			put_unweighted_edge,
+ put_unweighted_edge,
 			put_unweighted_unlabeled_edge,
 			unweighted_edge_from_values
 		undefine
@@ -64,11 +64,11 @@ create
 
 feature -- Access
 
-	edge_item: LINKED_GRAPH_WEIGHTED_EDGE [like item, L]
+	edge_item: detachable LINKED_GRAPH_WEIGHTED_EDGE [like item, L]
 			-- Current edge
 		do
-			if not current_node.edge_list.off then
-				Result ?= current_node.edge_list.item
+			if attached current_node as l_current_node and then not l_current_node.edge_list.off then
+				Result := {LINKED_GRAPH_WEIGHTED_EDGE [like item, L]} / l_current_node.edge_list.item
 			else
 				Result := Void
 			end
@@ -85,12 +85,13 @@ feature -- Access
 			if has_node (a_start_node) and has_node (a_end_node) then
 				start_node := linked_node_from_item (a_start_node)
 				end_node := linked_node_from_item (a_end_node)
-				create edge.make_directed (start_node, end_node, a_label, a_weight)
-
-				if has_edge (edge) then
-					Result := edge
-				else
-					Result := Void
+				if attached start_node and then attached end_node then
+					create edge.make_directed (start_node, end_node, a_label, a_weight)
+					if has_edge (edge) then
+						Result := edge
+					else
+						Result := Void
+					end
 				end
 			end
 		end
@@ -105,7 +106,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: like item; a_label: L; a_weight: REAL_64)
+	put_edge (a_start_node, a_end_node: like item; a_label: detachable L; a_weight: REAL_64)
 			-- Create an edge with weight `a_weight' between `a_start_node' and `a_end_node'.
 			-- The edge will be labeled `a_label'.
 			-- For symmetric graphs, another edge is inserted in the opposite direction.
@@ -115,13 +116,15 @@ feature -- Element change
 		do
 			start_node := linked_node_from_item (a_start_node)
 			end_node := linked_node_from_item (a_end_node)
-			create edge.make_directed (start_node, end_node, a_label, a_weight)
-			start_node.put_edge (edge)
-			internal_edges.extend (edge)
-			if is_symmetric_graph and start_node /= end_node then
-				create edge.make_directed (end_node, start_node, a_label, a_weight)
-				end_node.put_edge (edge)
+			if attached start_node and then attached end_node then
+				create edge.make_directed (start_node, end_node, a_label, a_weight)
+				start_node.put_edge (edge)
 				internal_edges.extend (edge)
+				if is_symmetric_graph and start_node /= end_node then
+					create edge.make_directed (end_node, start_node, a_label, a_weight)
+					end_node.put_edge (edge)
+					internal_edges.extend (edge)
+				end
 			end
 		end
 
@@ -130,13 +133,15 @@ feature -- Removal
 	prune_edge (a_edge: EDGE [like item, L])
 			-- Remove `a_edge' from the graph.
 		local
-			linked_edge, symmetric_edge: like edge_item
+			linked_edge: like edge_item
+			symmetric_edge: LINKED_GRAPH_WEIGHTED_EDGE [like item, L]
 			start_node, end_node: like current_node
+			l: L
 		do
 			prune_edge_impl (a_edge)
 			if is_symmetric_graph then
 					-- Find both start and end node in the node list.
-				linked_edge ?= a_edge
+				linked_edge := if attached {like edge_item} a_edge as l_edge then  l_edge else Void end
 				if linked_edge /= Void then
 					start_node := linked_edge.internal_start_node
 					end_node := linked_edge.internal_end_node
@@ -144,12 +149,13 @@ feature -- Removal
 					start_node := linked_node_from_item (a_edge.start_node)
 					end_node := linked_node_from_item (a_edge.end_node)
 				end
-				create symmetric_edge.make_directed (end_node, start_node, a_edge.label, linked_edge.weight)
-				current_node := end_node
-				prune_edge_impl (symmetric_edge)
+				if attached end_node and then attached start_node then
+					l := a_edge.label
+					create symmetric_edge.make_directed (end_node, start_node, l, if attached linked_edge as l_edge then l_edge.weight else 0.0 end)
+					prune_edge_impl (symmetric_edge)
+				end
 			end
 		end
-
 
 feature -- Resizing
 
@@ -172,10 +178,9 @@ feature -- Output
 	out: STRING
 			-- Printable representation of the graph
 		local
-			node: like current_node
-			edge: like edge_item
+				-- node: like current_node
+				-- edge: like edge_item
 			i, index: INTEGER
-			label: L
 		do
 			Result := "digraph linked_weighted_graph%N"
 			Result.append ("{%N")
@@ -184,35 +189,38 @@ feature -- Output
 			until
 				i > node_count
 			loop
-				node := node_list.item (i)
-				Result.append ("%"")
-				Result.append (node.item.out)
-				Result.append ("%";%N")
-				from
-						-- Store previous cursor position
-					index := node.edge_list.index
-					node.edge_list.start
-				until
-					node.edge_list.exhausted
-				loop
-					Result.append ("  %"")
+				check attached node_list.item (i) as node then
+					Result.append ("%"")
 					Result.append (node.item.out)
-					Result.append ("%" -> %"")
-					edge ?= node.edge_list.item
-					Result.append (edge.end_node.out)
-					Result.append ("%" [label=%"")
-					label := edge.label
-					if label /= Void and then not label.out.is_equal ("") then
-						Result.append (label.out)
-						Result.append ("\n")
+					Result.append ("%";%N")
+					from
+							-- Store previous cursor position
+						index := node.edge_list.index
+						node.edge_list.start
+					until
+						node.edge_list.exhausted
+					loop
+						Result.append ("  %"")
+						Result.append (node.item.out)
+						Result.append ("%" -> %"")
+							--						edge ?= node.edge_list.item
+						check attached {like edge_item} node.edge_list.item as edge then
+							Result.append (edge.end_node.out)
+							Result.append ("%" [label=%"")
+
+							if attached {ANY} edge.label as label and then label /= Void and then not label.out.is_equal ("") then
+								Result.append (label.out)
+								Result.append ("\n")
+							end
+							Result.append ("w = ")
+							Result.append (edge.weight.out)
+							Result.append ("%"];%N")
+						end
+						node.edge_list.forth
 					end
-					Result.append ("w = ")
-					Result.append (edge.weight.out)
-					Result.append ("%"];%N")
-					node.edge_list.forth
-				end
-				if node.edge_list.valid_index (index) then
-					node.edge_list.go_i_th (index)
+					if node.edge_list.valid_index (index) then
+						node.edge_list.go_i_th (index)
+					end
 				end
 				i := i + 1
 			end

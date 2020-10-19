@@ -3,14 +3,14 @@ note
 		Directed graphs, implemented on the basis
 		of an adjacency matrix.
 		Simple and symmetric graphs are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2009-08-21 13:35:22 +0200 (Пт, 21 авг 2009) $"
+	date: "$Date: 2009-08-21 13:35:22 +0200 (�%/159/�%/130/, 21 авг 2009) $"
 	revision: "$Revision: 1098 $"
 
 class
-	ADJACENCY_MATRIX_GRAPH [G -> HASHABLE, reference L]
+	ADJACENCY_MATRIX_GRAPH [G -> HASHABLE, L]
 
 inherit
 	GRAPH [G, L]
@@ -41,11 +41,12 @@ feature {NONE} -- Initialization
 	make_empty_adjacency_matrix_graph
 			-- Make an empty adjacency matrix graph.
 		do
-			-- Make empty node array and edge set.
-			create node_array.make (1,0)
+				-- Make empty node array and edge set.
+			create node_array.make (1, 0)
 			create {ARRAYED_LIST [like edge_item]} internal_edges.make (0)
-			-- Make an empty adjacency matrix.
-			create adjacency_matrix.make (1,1)
+				-- Make an empty adjacency matrix.
+				--			create adjacency_matrix.make (1,1)
+			create adjacency_matrix.make_filled (Void, 1, 1)
 			create inactive_nodes.make (0)
 			create history_stack.make (0)
 			create index_of_element.make (0)
@@ -65,7 +66,7 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	nodes,vertices: SET [like item]
+	nodes, vertices: SET [like item]
 			-- All nodes of the graph
 		local
 			i: INTEGER
@@ -101,7 +102,7 @@ feature -- Access
 			Result := node_array.item (current_target_node_index)
 		end
 
-	edge_item: EDGE [like item, L]
+	edge_item: detachable EDGE [like item, L]
 			-- Current edge
 		do
 			if current_target_node_index /= -1 then
@@ -116,24 +117,26 @@ feature -- Access
 		local
 			i: INTEGER
 		do
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
-				debug ("incident_edges")
-					print ("INCIDENT EDGES of `" + item.out + "':%N")
-				end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+				----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+			debug ("incident_edges")
+				print ("INCIDENT EDGES of `" + item.out + "':%N")
+			end
+				----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 			create {ARRAYED_LIST [like edge_item]} Result.make (out_degree)
 			from
 				i := first_edge_index
 			until
 				(i = -1) or (i > last_edge_index)
 			loop
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+					----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 				debug ("incident_edges")
-					print (adjacency_matrix.item (current_node_index, i).out + "%N")
+					print (if attached adjacency_matrix.item (current_node_index, i) as l_item then l_item.out else "" end + "%N")
 				end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
-				Result.extend (adjacency_matrix.item (current_node_index, i))
-				-- Find next edge
+					----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+				if attached adjacency_matrix.item (current_node_index, i) as l_item then
+					Result.extend (l_item)
+				end
+					-- Find next edge
 				from
 					i := i + 1
 				until
@@ -155,8 +158,11 @@ feature -- Access
 			until
 				(i = -1) or (i > last_edge_index)
 			loop
-				Result.extend (adjacency_matrix.item (current_node_index, i).label)
-				-- Find next edge
+				if attached adjacency_matrix.item (current_node_index, i) as l_item and then attached l_item.label as l_label then
+					Result.extend (l_label)
+				end
+
+					-- Find next edge
 				from
 					i := i + 1
 				until
@@ -179,7 +185,7 @@ feature -- Access
 				start_index := index_of_element.item (a_start_node)
 				end_index := index_of_element.item (a_end_node)
 				edge := adjacency_matrix.item (start_index, end_index)
-				if edge /= Void and then equal (edge.label, a_label) then
+				if edge /= Void and then equal (attached {ANY} edge.label as l_label, attached {ANY} a_label as la_label) then
 					Result := edge
 				else
 					Result := Void
@@ -193,13 +199,13 @@ feature -- Access
 			-- Object that identifies the current item
 		do
 			Result := current_node_index
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+				----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 			debug ("node_identity")
 				print ("node_identity = `")
 				print (Result)
 				print ("'%N")
 			end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+				----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 		end
 
 feature -- Measurement
@@ -290,7 +296,9 @@ feature -- Status report
 		do
 			start_index := index_of_element.item (a_edge.start_node)
 			end_index := index_of_element.item (a_edge.end_node)
-			Result := a_edge.is_equal (adjacency_matrix.item (start_index, end_index))
+			if attached adjacency_matrix.item (start_index, end_index) as l_item then
+				Result := a_edge.is_equal (l_item)
+			end
 		end
 
 	has_edge_between (a_start_node, a_end_node: like item): BOOLEAN
@@ -310,7 +318,7 @@ feature -- Status report
 			i: INTEGER
 		do
 			compact_adjacency_matrix
-			-- Search for loops in the graph (nodes connected to themselves).
+				-- Search for loops in the graph (nodes connected to themselves).
 			from
 				i := 1
 			until
@@ -380,7 +388,6 @@ feature -- New Cursor
 			Result.start
 		end
 
-
 feature -- Cursor movement
 
 	start
@@ -388,7 +395,7 @@ feature -- Cursor movement
 		do
 			find_first_edge_index
 			find_last_edge_index
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+				----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 			debug ("start")
 				print ("START first edge index = ")
 				print (first_edge_index)
@@ -396,7 +403,7 @@ feature -- Cursor movement
 				print (last_edge_index)
 				print ("%N")
 			end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+				----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 			current_target_node_index := first_edge_index
 			exhausted := current_target_node_index = -1
 		end
@@ -411,8 +418,8 @@ feature -- Cursor movement
 			then
 				current_target_node_index := last_edge_index
 			else
-				-- Since `is_first_edge' is false, there must be another edge.
-				-- Hence the following code must not produce an access violation.
+					-- Since `is_first_edge' is false, there must be another edge.
+					-- Hence the following code must not produce an access violation.
 				from
 					i := current_target_node_index - 1
 				until
@@ -423,7 +430,7 @@ feature -- Cursor movement
 				current_target_node_index := i
 			end
 
-			-- Check if we went around.
+				-- Check if we went around.
 			if is_first_edge then
 				exhausted := True
 			end
@@ -434,15 +441,15 @@ feature -- Cursor movement
 		local
 			i: INTEGER
 		do
-			-- Check if we went around.
+				-- Check if we went around.
 			if
 				is_last_edge
 			then
 				current_target_node_index := first_edge_index
 				exhausted := True
 			else
-				-- Since `is_last_edge' is false, there must be another edge.
-				-- Hence the following code must not produce an access violation.
+					-- Since `is_last_edge' is false, there must be another edge.
+					-- Hence the following code must not produce an access violation.
 				from
 					i := current_target_node_index + 1
 				until
@@ -497,21 +504,21 @@ feature -- Element change
 		do
 			if not has_node (a_item) then
 				if not inactive_nodes.is_empty then
-					-- Recycle inactive node if possible.
+						-- Recycle inactive node if possible.
 					inactive_nodes.start
 					item_index := inactive_nodes.item
 					inactive_nodes.prune (item_index)
 				else
-					-- Item index is `count'+1.
+						-- Item index is `count'+1.
 					item_index := node_array.count + 1
 					adjacency_matrix.resize (item_index, item_index)
 				end
 
-				-- Put node into array and hash table.
+					-- Put node into array and hash table.
 				node_array.force (a_item, item_index)
 				index_of_element.extend (item_index, a_item)
 
-				-- Empty the adjacency matrix cells.
+					-- Empty the adjacency matrix cells.
 				from
 					i := 1
 				until
@@ -524,7 +531,7 @@ feature -- Element change
 			end
 		end
 
-	put_edge (a_start_node, a_end_node: like item; a_label: L)
+	put_edge (a_start_node, a_end_node: like item; a_label: detachable L)
 			-- Create an edge between `a_start_node' and `a_end_node'
 			-- and set its label to `a_label'.
 			-- For symmetric graphs, another edge is inserted in the opposite direction.
@@ -540,11 +547,11 @@ feature -- Element change
 			internal_edges.extend (edge)
 			if is_symmetric_graph and not a_start_node.is_equal (a_end_node) then
 				create edge.make_directed (a_end_node, a_start_node, a_label)
-				adjacency_matrix.put (edge, start_index, end_index)
+				adjacency_matrix.put (edge, end_index, start_index)
 				internal_edges.extend (edge)
 			end
 
-			-- Update index bounds if necessary.
+				-- Update index bounds if necessary.
 			if end_index < first_edge_index then
 				first_edge_index := end_index
 			elseif end_index > last_edge_index then
@@ -563,13 +570,13 @@ feature -- Removal
 		do
 			item_index := index_of_element.item (a_item)
 			if item_index > 0 then
-				-- Continue only if `a_item' has been found.
+					-- Continue only if `a_item' has been found.
 				if current_node_index = item_index then
-					-- Set `off' if `item' is pruned.
+						-- Set `off' if `item' is pruned.
 					current_node_index := -1
 				elseif current_target_node_index = item_index then
 					if out_degree > 1 then
-						-- Turn right if `target' is removed.
+							-- Turn right if `target' is removed.
 						right
 					else
 						current_target_node_index := -1
@@ -578,11 +585,11 @@ feature -- Removal
 				end
 
 				if item_index = node_array.count then
-					-- Shrink the adjacency matrix if possible.
+						-- Shrink the adjacency matrix if possible.
 					node_array.conservative_resize (1, item_index - 1)
 					adjacency_matrix.resize (item_index - 1, item_index - 1)
 				else
-					-- Otherwise remove `item' and all incident edges.
+						-- Otherwise remove `item' and all incident edges.
 					inactive_nodes.put (item_index)
 					from
 						i := 1
@@ -600,7 +607,7 @@ feature -- Removal
 			-- Remove `a_edge' from the graph.
 			-- The cursor will turn right if `current_egde' is removed.
 		do
-			-- This will work, since we only have a simple graph.
+				-- This will work, since we only have a simple graph.
 			prune_edge_between (a_edge.start_node, a_edge.end_node)
 		end
 
@@ -616,7 +623,7 @@ feature -- Removal
 
 			if current_target_node_index = end_index then
 				if out_degree > 1 then
-					-- Turn right if `target' is removed.
+						-- Turn right if `target' is removed.
 					right
 				else
 					current_target_node_index := -1
@@ -624,21 +631,27 @@ feature -- Removal
 				end
 			end
 
-			-- Remove the edge from the edge list.
-			internal_edges.prune (adjacency_matrix.item (start_index, end_index))
-
-			adjacency_matrix.put (Void, start_index, end_index)
-			-- Perform symmetric operation graph is symmetric.
-			if is_symmetric_graph then
-				internal_edges.prune (adjacency_matrix.item (end_index, start_index))
-				adjacency_matrix.put (Void, end_index, start_index)
+				-- Remove the edge from the edge list.
+			if attached adjacency_matrix.item (start_index, end_index) as l_item then
+				internal_edges.prune (l_item)
 			end
 
-			-- Adjust node indices if necessary.
-			if end_index = first_edge_index then
+			adjacency_matrix.put (Void, start_index, end_index)
+				-- Perform symmetric operation graph is symmetric.
+			if is_symmetric_graph then
+				if attached adjacency_matrix.item (end_index, start_index) as l_item then
+					internal_edges.prune (l_item)
+					adjacency_matrix.put (Void, end_index, start_index)
+				end
+			end
+
+				-- Adjust node indices if necessary.
+			if not off and then start_index = first_edge_index then
 				find_first_edge_index
-			elseif end_index = last_edge_index then
+				current_target_node_index := first_edge_index
+			elseif not off and then end_index = last_edge_index then
 				find_last_edge_index
+				current_target_node_index := last_edge_index
 			end
 		end
 
@@ -662,19 +675,21 @@ feature -- Miscellaneous
 			new_node_array: like node_array
 		do
 			if not inactive_nodes.is_empty then
-				-- Make new adjacency matrix and node array.
-				create new_matrix.make (node_count, node_count)
+					-- Make new adjacency matrix and node array.
+				create new_matrix.make_filled (Void, node_count, node_count)
 				create new_node_array.make (1, node_count)
+
+
 				from
 					i := 1
 					new_i := i
 				until
 					i > node_array.count
 				loop
-					-- Copy only rows with a valid node index.
+						-- Copy only rows with a valid node index.
 					if not inactive_nodes.has (i) then
 						from
-							j :=1
+							j := 1
 							new_j := 1
 						until
 							j > node_array.count
@@ -701,7 +716,7 @@ feature -- Output
 		local
 			i, j: INTEGER
 			node: like item
-			label: ANY
+			label: L
 		do
 			Result := "digraph adjacency_matrix_graph%N"
 			Result.append ("{%N")
@@ -728,11 +743,14 @@ feature -- Output
 							Result.append ("%" -> %"")
 							Result.append (node_array.item (j).out)
 							Result.append ("%"")
-							label := adjacency_matrix.item (i, j).label
-							if label /= Void and then not label.out.is_equal ("") then
-								Result.append (" [label=%"")
-								Result.append (label.out)
-								Result.append ("%"]")
+
+							label := if attached adjacency_matrix.item (i, j) as l_item then l_item.label else label end
+							separate label as s_label do
+								if attached s_label as ls_label and then not ls_label.out.is_equal ("") then
+									Result.append (" [label=%"")
+									Result.append (create {STRING}.make_from_separate (ls_label.out))
+									Result.append ("%"]")
+								end
 							end
 							Result.append (";%N")
 						end
@@ -750,7 +768,7 @@ feature -- Inapplicable
 
 feature {NONE} -- Implementation
 
-	adjacency_matrix: ARRAY2 [like edge_item]
+	adjacency_matrix: ARRAY2 [detachable like edge_item]
 			-- Adjacency matrix
 
 	node_array: ARRAY [like item]
@@ -776,8 +794,6 @@ feature {NONE} -- Implementation
 	last_edge_index: INTEGER
 			-- Index of the last edge
 
-
-
 	empty_graph: like Current
 			-- Empty graph with the same actual type than `Current'
 		do
@@ -787,7 +803,6 @@ feature {NONE} -- Implementation
 				create Result.make_symmetric_graph
 			end
 		end
-
 
 	find_first_edge_index
 			-- Find the first edge for the current node.
@@ -807,7 +822,7 @@ feature {NONE} -- Implementation
 				i := i + 1
 			end
 			if found then
-				first_edge_index := i-1
+				first_edge_index := i - 1
 			else
 				first_edge_index := -1
 			end

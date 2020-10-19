@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-21-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-21-0 http://www.eiffel.com/developers/xml/configuration-1-21-0.xsd" name="libgraph_test" uuid="813911BC-EA08-4EEE-8322-85D6C1B4553D">
-	<target name="libgraph_test">
+<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-21-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-21-0 http://www.eiffel.com/developers/xml/configuration-1-21-0.xsd" name="graph_test" uuid="813911BC-EA08-4EEE-8322-85D6C1B4553D">
+	<target name="graph_test">
 		<root class="TEST_GRAPH" feature="make"/>
-		<option warning="warning" full_class_checking="false" is_attached_by_default="true" is_obsolete_routine_type="true" syntax="standard" manifest_array_type="mismatch_warning">
+		<option warning="warning" manifest_array_type="mismatch_warning">
 			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
-			<warning name="export_class_missing" enabled="false"/>
-			<warning name="old_verbatim_strings" enabled="false"/>
-			<warning name="once_in_generic" enabled="false"/>
-			<warning name="syntax" enabled="true"/>
-			<warning name="vjrv" enabled="false"/>
-			<warning name="vweq" enabled="false"/>
 		</option>
-		<setting name="dead_code_removal" value="feature"/>
 		<capability>
-			<concurrency support="none"/>
-			<void_safety support="none"/>
+			<void_safety support="all" use="transitional"/>
 		</capability>
 		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
-		<library name="libgraph" location="..\graph.ecf" readonly="false" use_application_options="true"/>
+		<library name="graph" location="..\graph.ecf" readonly="false"/>
 		<library name="testing" location="$ISE_LIBRARY\library\testing\testing.ecf"/>
 		<cluster name="test" location=".\" recursive="true">
 			<file_rule>

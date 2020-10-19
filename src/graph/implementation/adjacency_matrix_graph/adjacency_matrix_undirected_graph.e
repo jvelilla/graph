@@ -3,14 +3,14 @@ note
 		Undirected graphs, implemented on the basis
 		of an adjacency matrix.
 		Only simple graphs are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2009-04-06 14:42:41 +0200 (Пн, 06 апр 2009) $"
+	date: "$Date: 2009-04-06 14:42:41 +0200 (�%/159/н, 06 ап�%/128/ 2009) $"
 	revision: "$Revision: 1086 $"
 
 class
-	ADJACENCY_MATRIX_UNDIRECTED_GRAPH [G -> HASHABLE, reference L]
+	ADJACENCY_MATRIX_UNDIRECTED_GRAPH [G -> HASHABLE, L]
 
 inherit
 	ADJACENCY_MATRIX_GRAPH [G, L]
@@ -18,7 +18,7 @@ inherit
 			in_degree as degree,
 			out_degree as degree
 		export {NONE}
-			is_dag
+ 			is_dag
 		undefine
 			adopt_edge,
 			components,
@@ -81,10 +81,10 @@ feature -- Measurement
 				loop
 					if adjacency_matrix.item (current_node_index, i) /= Void then
 						if current_node_index /= i then
-							-- "Normal" edges are counted once.
+								-- "Normal" edges are counted once.
 							Result := Result + 1
 						else
-							-- Graph loops are counted twice.
+								-- Graph loops are counted twice.
 							Result := Result + 2
 						end
 					end
@@ -107,7 +107,7 @@ feature -- Measurement
 				from
 					j := 1
 				until
-					j > i	-- Consider only the upper half of the matrix
+					j > i -- Consider only the upper half of the matrix
 				loop
 					if valid_index (i) and valid_index (j) and (adjacency_matrix.item (i, j) /= Void) then
 						Result := Result + 1
@@ -136,7 +136,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: like item; a_label: L)
+	put_edge (a_start_node, a_end_node: like item; a_label: detachable L)
 			-- Create an edge between `a_start_node' and `a_end_node'
 			-- and set its label to `a_label'.
 			-- The cursor is not moved.
@@ -151,7 +151,7 @@ feature -- Element change
 			adjacency_matrix.put (edge, end_index, start_index)
 			internal_edges.extend (edge)
 
-			-- Update index bounds if necessary.
+				-- Update index bounds if necessary.
 			if end_index < first_edge_index then
 				first_edge_index := end_index
 			elseif end_index > last_edge_index then
@@ -173,7 +173,7 @@ feature -- Removal
 
 			if (not off) and then (current_target_node_index = end_index) then
 				if degree > 1 then
-					-- Turn right if `target' is removed.
+						-- Turn right if `target' is removed.
 					right
 				else
 					current_target_node_index := -1
@@ -181,18 +181,27 @@ feature -- Removal
 				end
 			end
 
-			-- Remove edge from edge list.
-			internal_edges.prune (adjacency_matrix.item (start_index, end_index))
+				-- Remove edge from edge list.
+			if attached adjacency_matrix.item (start_index, end_index) as l_item then
+				internal_edges.prune (l_item)
+			end
 
-			-- Adjust the adjacency matrix.
+				-- Adjust the adjacency matrix.
 			adjacency_matrix.put (Void, start_index, end_index)
 			adjacency_matrix.put (Void, end_index, start_index)
 
-			-- Adjust node indices if necessary.
-			if (not off) and then (end_index = first_edge_index) then
+			if not off and then degree = 0 then
+				current_target_node_index := -1
+				exhausted := True
+			end
+
+				-- Adjust node indices if necessary.
+			if (not off) and then (start_index = first_edge_index) then
 				find_first_edge_index
+				current_target_node_index := first_edge_index
 			elseif (not off) and then (end_index = last_edge_index) then
 				find_last_edge_index
+				current_target_node_index := last_edge_index
 			end
 		end
 
@@ -200,7 +209,7 @@ feature -- Removal
 			-- Remove `a_edge' from the graph.
 			-- The cursor will turn right if `current_egde' is removed.
 		do
-			-- This will work, since we only have a simple graph.
+				-- This will work, since we only have a simple graph.
 			prune_edge_between (a_edge.start_node, a_edge.end_node)
 		end
 
@@ -223,7 +232,7 @@ feature -- Output
 		local
 			i, j: INTEGER
 			node: like item
-			label: ANY
+			label: L
 		do
 			Result := "graph adjacency_matrix_undirected_graph%N"
 			Result.append ("{%N")
@@ -239,7 +248,7 @@ feature -- Output
 				from
 					j := 1
 				until
-					j > i	-- Consider only the upper half of the graph.
+					j > i -- Consider only the upper half of the graph.
 				loop
 					if
 						adjacency_matrix.item (i, j) /= Void
@@ -249,11 +258,13 @@ feature -- Output
 						Result.append ("%" -- %"")
 						Result.append (node_array.item (j).out)
 						Result.append ("%"")
-						label := adjacency_matrix.item (i, j).label
-						if label /= Void and then not label.out.is_equal ("") then
-							Result.append (" [label=%"")
-							Result.append (label.out)
-							Result.append ("%"]")
+						label := if attached adjacency_matrix.item (i, j) as l_item then l_item.label else label end
+						separate label as s_label do
+							if attached s_label as ls_label and then not ls_label.out.is_equal ("") then
+								Result.append (" [label=%"")
+								Result.append (create {STRING}.make_from_separate (ls_label.out))
+								Result.append ("%"]")
+							end
 						end
 						Result.append (";%N")
 					end
@@ -270,7 +281,7 @@ feature -- Inapplicable
 
 feature {NONE} -- Implementation
 
-	empty_graph: like Current 
+	empty_graph: like Current
 			-- Empty graph with the same actual type than `Current'
 		do
 			create Result.make_simple_graph

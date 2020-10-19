@@ -10,7 +10,7 @@ note
 	revision: "$Revision: 1133 $"
 
 deferred class
-	UNDIRECTED_WEIGHTED_GRAPH [G -> HASHABLE, reference L]
+	UNDIRECTED_WEIGHTED_GRAPH [G -> HASHABLE, L]
 
 inherit
 	UNDIRECTED_GRAPH [G, L]
@@ -53,7 +53,7 @@ inherit
 
 feature -- Access
 
-	edge_item: WEIGHTED_EDGE [like item, L]
+	edge_item: detachable WEIGHTED_EDGE [like item, L]
 			-- Current edge
 		deferred
 		end
@@ -79,7 +79,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: like item; a_label: L; a_weight: REAL_64)
+	put_edge (a_start_node, a_end_node: like item; a_label: detachable L; a_weight: REAL_64)
 			-- Create an edge with weight `a_weight' between `a_start_node' and `a_end_node'.
 			-- The edge will be labeled `a_label'.
 			-- The cursor is not moved.
@@ -91,8 +91,10 @@ feature -- Element change
 	put_unlabeled_edge (a_start_node, a_end_node: like item; a_weight: REAL_64)
 			-- Create an edge with weight `a_weight' between `a_start_node' and `a_end_node'.
 			-- The cursor is not moved.
+		local
+			l: L
 		do
-			put_edge (a_start_node, a_end_node, Void, a_weight)
+			put_edge (a_start_node, a_end_node, l, a_weight)
 		ensure then
 			undirected_graph: has_edge_between (a_start_node, a_end_node) and has_edge_between (a_end_node, a_start_node)
 		end
@@ -110,13 +112,13 @@ feature -- Transformation
 			connected_graph: is_connected
 			positive_weights: all_weights_positive
 		local
-			edge: like edge_item
+			-- edge: like edge_item
 			node_list: like linear_representation
 			edge_list: ARRAYED_LIST [like edge_item]
-			lin_rep: LINEAR [like edge_item]
 			set_1, set_2: INTEGER
 			mst: like Current
 			uf: UNION_FIND_STRUCTURE [like item]
+			l: L
 		do
 			mst := empty_graph
 			node_list := linear_representation
@@ -136,14 +138,15 @@ feature -- Transformation
 
 			-- Put edges into sorted array (priority queue with lowest priority first).
 			create edge_list.make (0)
-			from
-				lin_rep := edges.linear_representation
-				lin_rep.start
-			until
-				lin_rep.after
-			loop
-				sorted_put (lin_rep.item, edge_list)
-				lin_rep.forth
+			if attached {LINEAR [like edge_item]} edges.linear_representation as lin_rep then
+				from
+					lin_rep.start
+				until
+					lin_rep.after
+				loop
+					sorted_put (lin_rep.item, edge_list)
+					lin_rep.forth
+				end
 			end
 
 			-- Traverse edges in increasing order and keep only the MST edges.
@@ -152,18 +155,21 @@ feature -- Transformation
 				edge_list.is_empty
 			loop
 				edge_list.start
-				edge := edge_list.item
-				set_1 := uf.find (edge.start_node)
-				set_2 := uf.find (edge.end_node)
-				if set_1 /= set_2 then
-					-- Keep edges that connect two independent graph parts.
-					mst.put_edge (edge.start_node, edge.end_node, edge.label, edge.weight)
-					uf.union (set_1, set_2)
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
-					debug ("mst")
-						print ("MST: Keeping edge `" + edge.out + "'%N")
+--				edge := edge_list.item
+				if attached edge_list.item as edge then
+					set_1 := uf.find (edge.start_node)
+					set_2 := uf.find (edge.end_node)
+					if set_1 /= set_2 then
+						-- Keep edges that connect two independent graph parts.
+						l := edge.label
+						mst.put_edge (edge.start_node, edge.end_node, l, edge.weight)
+						uf.union (set_1, set_2)
+	----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+						debug ("mst")
+							print ("MST: Keeping edge `" + edge.out + "'%N")
+						end
+	----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 					end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 				end
 				edge_list.remove
 			end
@@ -187,7 +193,7 @@ feature -- Obsolete
 
 feature {NONE} -- Inapplicable
 
-	put_unweighted_edge (a_start_node, a_end_node: like item; a_label: L)
+	put_unweighted_edge (a_start_node, a_end_node: like item; a_label: detachable L)
 			-- Not applicable anymore. Edges must be weighted.
 		do
 			-- Workaround for catcalls: Put unweighted edge instead.
@@ -198,8 +204,11 @@ feature {NONE} -- Implementation
 
 	adopt_edge (a_edge: WEIGHTED_EDGE [like item, L])
 			-- Put `a_edge' into current graph.
+		local
+			l: L
 		do
-			put_edge (a_edge.start_node, a_edge.end_node, a_edge.label, a_edge.weight)
+			l := a_edge.label
+			put_edge (a_edge.start_node, a_edge.end_node, l, a_edge.weight)
 		end
 
 	sorted_put (a_edge: like edge_item; edge_list: ARRAYED_LIST [like edge_item])
@@ -211,35 +220,37 @@ feature {NONE} -- Implementation
 		local
 			l, r, p: INTEGER
 		do
-			-- Note: This routine is necessary because `WEIGHTED_EDGE' cannot
-			-- inherit from `COMPARABLE' (failure of `is_equal' because of
-			-- trichotomy postcondition). Hence no sortable data structure can be used.
-			if edge_list.is_empty then
-				edge_list.extend (a_edge)
-			else
-				-- Find insertion position for `edge_list' via binary search.
-				from
-					l := 1
-					r := edge_list.count
-				variant
-					r-l
-				until
-					r <= (l+1)
-				loop
-					p := (l+r) // 2
-					if edge_list.i_th (p).weight < a_edge.weight then
-						l := p
-					else
-						r := p
-					end
-				end
-
-				-- Decide whether to insert the new item at the left or right.
-				edge_list.go_i_th (l)
-				if edge_list.item.weight < a_edge.weight then
-					edge_list.put_right (a_edge)
+			check attached a_edge then
+				-- Note: This routine is necessary because `WEIGHTED_EDGE' cannot
+				-- inherit from `COMPARABLE' (failure of `is_equal' because of
+				-- trichotomy postcondition). Hence no sortable data structure can be used.
+				if edge_list.is_empty then
+					edge_list.extend (a_edge)
 				else
-					edge_list.put_left (a_edge)
+					-- Find insertion position for `edge_list' via binary search.
+					from
+						l := 1
+						r := edge_list.count
+					until
+						r <= (l+1)
+					loop
+						p := (l+r) // 2
+						if attached edge_list.i_th (p) as l_item and then l_item.weight < a_edge.weight then
+							l := p
+						else
+							r := p
+						end
+					variant
+						r-l
+					end
+
+					-- Decide whether to insert the new item at the left or right.
+					edge_list.go_i_th (l)
+					if attached edge_list.item as l_item and then l_item.weight < a_edge.weight then
+						edge_list.put_right (a_edge)
+					else
+						edge_list.put_left (a_edge)
+					end
 				end
 			end
 		end

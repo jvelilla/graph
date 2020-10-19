@@ -3,14 +3,14 @@ note
 		Directed weighted graphs, implemented on the basis
 		of an adjacency matrix.
 		Simple and symmetric graphs are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2010-06-28 20:14:26 +0200 (Пн, 28 июн 2010) $"
+	date: "$Date: 2010-06-28 20:14:26 +0200 (�%/159/н, 28 и�%/142/н 2010) $"
 	revision: "$Revision: 1133 $"
 
 class
-	ADJACENCY_MATRIX_WEIGHTED_GRAPH [G -> HASHABLE, reference L]
+	ADJACENCY_MATRIX_WEIGHTED_GRAPH [G -> HASHABLE, L]
 
 inherit
 	ADJACENCY_MATRIX_GRAPH [G, L]
@@ -19,7 +19,7 @@ inherit
 			put_unlabeled_edge as put_unweighted_unlabeled_edge,
 			edge_from_values as unweighted_edge_from_values
 		export {NONE}
-			put_unweighted_edge,
+ 			put_unweighted_edge,
 			put_unweighted_unlabeled_edge,
 			unweighted_edge_from_values
 		undefine
@@ -47,8 +47,8 @@ inherit
 			forth,
 			out
 		redefine
---			border_nodes,
---			edge_item
+			--			border_nodes,
+			--			edge_item
 		end
 
 create
@@ -57,7 +57,7 @@ create
 
 feature -- Access
 
-	edge_item: WEIGHTED_EDGE [like item, L]
+	edge_item: detachable WEIGHTED_EDGE [like item, L]
 			-- Current edge
 		do
 			if current_target_node_index /= -1 then
@@ -79,7 +79,7 @@ feature -- Access
 				start_index := index_of_element.item (a_start_node)
 				end_index := index_of_element.item (a_end_node)
 				edge := adjacency_matrix.item (start_index, end_index)
-				if edge /= Void and then equal (edge.label, a_label) and then equal (edge.weight, a_weight) then
+				if edge /= Void and then equal (attached {ANY} edge.label as label, attached {ANY} a_label as la_label) and then equal (edge.weight, a_weight) then
 					Result := edge
 				else
 					Result := Void
@@ -99,7 +99,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: G; a_label: L; a_weight: REAL_64)
+	put_edge (a_start_node, a_end_node: G; a_label: detachable L; a_weight: REAL_64)
 			-- Create an edge with weight `a_weight' between `a_start_node' and `a_end_node'.
 			-- The edge will be labeled `a_label'.
 			-- For symmetric graphs, another edge is inserted in the opposite direction.
@@ -119,7 +119,7 @@ feature -- Element change
 				internal_edges.extend (edge)
 			end
 
-			-- Update index bounds if necessary.
+				-- Update index bounds if necessary.
 			if end_index < first_edge_index then
 				first_edge_index := end_index
 			elseif end_index > last_edge_index then
@@ -152,7 +152,7 @@ feature -- Output
 		local
 			i, j: INTEGER
 			node: G
-			label: ANY
+			label: L
 			edge: WEIGHTED_EDGE [G, L]
 		do
 			Result := "digraph adjacency_matrix_graph%N"
@@ -181,9 +181,11 @@ feature -- Output
 						Result.append (node_array.item (j).out)
 						Result.append ("%" [label=%"")
 						label := edge.label
-						if label /= Void and then not label.out.is_equal ("") then
-							Result.append (label.out)
-							Result.append ("\n")
+						separate label as s_label do
+							if attached s_label as ls_label and then not ls_label.out.is_equal ("") then
+								Result.append (create {STRING}.make_from_separate (ls_label.out))
+								Result.append ("\n")
+							end
 						end
 						Result.append ("w = ")
 						Result.append (edge.weight.out)

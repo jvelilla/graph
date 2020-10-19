@@ -14,7 +14,7 @@ note
 	revision: "$Revision: 1086 $"
 
 class
-	BFS_WALKER [G -> HASHABLE, reference L]
+	BFS_WALKER [G -> HASHABLE, L]
 
 inherit
 	ABSTRACT_FS_WALKER [G, L]

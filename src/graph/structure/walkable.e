@@ -106,14 +106,14 @@ feature -- Cursor movement
 				start
 			until
 				exhausted or else
-				(object_comparison and equal(target,t)) or
+				(object_comparison and equal(attached {ANY} target as t1, attached {ANY} t as t2)) or
 				(not object_comparison and (target = t))
 			loop
 				left
 			end
 		ensure
 			item_found: (not exhausted and not object_comparison) implies target = t
-			object_found: (not exhausted and object_comparison) implies equal(target,t)
+			object_found: (not exhausted and object_comparison) implies equal(attached {ANY} target as t1, attached {ANY} t as t2)
 		end
 
 	back
@@ -152,7 +152,7 @@ feature -- Cursor movement
 		deferred
 		ensure
 			item_found: (not off and not object_comparison) implies a_item = item
-			object_found: (not off and object_comparison) implies equal(a_item,item)
+			object_found: (not off and object_comparison) implies equal(attached {ANY} a_item as item1, attached {ANY} item as item2)
 		end
 
 invariant

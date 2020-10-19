@@ -3,14 +3,14 @@ note
 		Undirected weighted graphs, implemented as
 		dynamically linked structure.
 		Both simple graphs and multigraphs are supported.
-		]"
+	]"
 	author: "Olivier Jeger"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2010-06-28 20:14:26 +0200 (Пн, 28 июн 2010) $"
+	date: "$Date: 2010-06-28 20:14:26 +0200 (�%/159/н, 28 и�%/142/н 2010) $"
 	revision: "$Revision: 1133 $"
 
 class
-	LINKED_UNDIRECTED_WEIGHTED_GRAPH [G -> HASHABLE, reference L]
+	LINKED_UNDIRECTED_WEIGHTED_GRAPH [G -> HASHABLE, L]
 
 inherit
 	LINKED_UNDIRECTED_GRAPH [G, L]
@@ -19,7 +19,7 @@ inherit
 			put_unlabeled_edge as put_unweighted_unlabeled_edge,
 			edge_from_values as unweighted_edge_from_values
 		export {NONE}
-			unweighted_edge_from_values,
+ 			unweighted_edge_from_values,
 			put_unweighted_edge,
 			put_unweighted_unlabeled_edge
 		undefine
@@ -37,7 +37,7 @@ inherit
 			in_degree as degree,
 			out_degree as degree
 		export {NONE}
-			is_dag
+ 			is_dag
 		undefine
 			adopt_edge,
 			components,
@@ -54,7 +54,9 @@ inherit
 			is_dag,
 			is_connected,
 			is_eulerian,
-			out
+			out,
+			target,
+			neighbors
 		redefine
 			put_edge
 		end
@@ -77,6 +79,7 @@ inherit
 			edge_count,
 			put_unweighted_edge,
 			forth,
+			neighbors,
 			out
 		end
 
@@ -96,7 +99,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: G; a_label: L; a_weight: REAL_64) 
+	put_edge (a_start_node, a_end_node: G; a_label: detachable L; a_weight: REAL_64)
 			-- Create an edge with weight `a_weight' between `a_start_node' and `a_end_node'.
 			-- The edge will be labeled `a_label'.
 		local
@@ -105,12 +108,13 @@ feature -- Element change
 		do
 			start_node := linked_node_from_item (a_start_node)
 			end_node := linked_node_from_item (a_end_node)
-			create edge.make_undirected (start_node, end_node, a_label, a_weight)
-			start_node.put_edge (edge)
-			end_node.put_edge (edge)
-			internal_edges.extend (edge)
+			if attached start_node and then attached end_node then
+				create edge.make_undirected (start_node, end_node, a_label, a_weight)
+				start_node.put_edge (edge)
+				end_node.put_edge (edge)
+				internal_edges.extend (edge)
+			end
 		end
-
 
 feature -- Removal
 
@@ -136,10 +140,9 @@ feature -- Output
 			-- Textual representation of the graph
 		local
 			i, index: INTEGER
-			node: like current_node
-			edge: like edge_item
+				-- node: like current_node
+				-- edge: like edge_item
 			edges_todo: like edges
-			label: ANY
 		do
 			Result := "graph linked_undirected_graph%N"
 			Result.append ("{%N")
@@ -152,38 +155,40 @@ feature -- Output
 			until
 				i > node_count
 			loop
-				node := node_list.item (i)
-				Result.append ("%"")
-				Result.append (node.item.out)
-				Result.append ("%";%N")
-				from
-					index := node.edge_list.index
-					node.edge_list.start
-				until
-					node.edge_list.exhausted
-				loop
-					edge ?= node.edge_list.item
-					if edges_todo.has (edge) then
-						Result.append ("  %"")
-						Result.append (node.item.out)
-						Result.append ("%" -- %"")
-						Result.append (edge.opposite_node (node.item).out)
-						Result.append ("%" [label=%"")
-						label := node.edge_list.item.label
-						if label /= Void and then not label.out.is_equal ("") then
-							Result.append (label.out)
-							Result.append ("\n")
+				if attached node_list.item (i) as node then
+					Result.append ("%"")
+					Result.append (node.item.out)
+					Result.append ("%";%N")
+					from
+						index := node.edge_list.index
+						node.edge_list.start
+					until
+						node.edge_list.exhausted
+					loop
+						if attached {like edge_item} node.edge_list.item as edge then
+							if edges_todo.has (edge) then
+								Result.append ("  %"")
+								Result.append (node.item.out)
+								Result.append ("%" -- %"")
+								Result.append (edge.opposite_node (node.item).out)
+								Result.append ("%" [label=%"")
+
+								if attached {ANY} node.edge_list.item.label as label and then label /= Void and then not label.out.is_equal ("") then
+									Result.append (label.out)
+									Result.append ("\n")
+								end
+								Result.append ("w = ")
+								Result.append (edge.weight.out)
+								Result.append ("%"];%N")
+								edges_todo.start
+								edges_todo.prune (edge)
+							end
 						end
-						Result.append ("w = ")
-						Result.append (edge.weight.out)
-						Result.append ("%"];%N")
-						edges_todo.start
-						edges_todo.prune (edge)
+						node.edge_list.forth
 					end
-					node.edge_list.forth
-				end
-				if node.edge_list.valid_index (index) then
-					node.edge_list.go_i_th (index)
+					if node.edge_list.valid_index (index) then
+						node.edge_list.go_i_th (index)
+					end
 				end
 				i := i + 1
 			end

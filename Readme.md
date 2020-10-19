@@ -7,3 +7,10 @@
 
 ## Work in progress
 Converrintg existing library (part of [Traffic3](https://github.com/eiffelhub/Traffic3)) to Void-Safety.
+
+## Changelog
+
+	Fixed contract violations at runtime.
+	Complete Void Safety.
+	Expanded types can be used for Labels.
+	Added test cases.

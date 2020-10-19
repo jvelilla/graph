@@ -9,7 +9,7 @@ note
 	revision: "$Revision: 1086 $"
 
 deferred class
-	UNDIRECTED_GRAPH [G -> HASHABLE, reference L]
+	UNDIRECTED_GRAPH [G -> HASHABLE,  L]
 
 inherit
 	GRAPH [G, L]
@@ -113,7 +113,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: like item; a_label: L)
+	put_edge (a_start_node, a_end_node: like item; a_label: detachable L)
 			-- Create an edge between `a_start_node' and `a_end_node'
 			-- and set its label to `a_label'.
 			-- The cursor is not moved.
@@ -126,8 +126,10 @@ feature -- Element change
 	put_unlabeled_edge (a_start_node, a_end_node: like item)
 			-- Create an edge between `a_start_node' and `a_end_node'.
 			-- The cursor is not moved.
+		local
+			l: L
 		do
-			put_edge (a_start_node, a_end_node, Void)
+			put_edge (a_start_node, a_end_node, l)
 		ensure then
 			undirected_graph: has_edge_between (a_start_node, a_end_node) and has_edge_between (a_end_node, a_start_node)
 			edge_count: edge_count = old edge_count + 1
@@ -165,7 +167,9 @@ feature {NONE} -- Implementation
 	opposite_node (a_edge: like edge_item; a_node: like item): like item
 			-- End node of `a_edge' when `a_node' is the start node
 		do
-			Result := a_edge.opposite_node (a_node)
+			check attached a_edge as l_edge  then
+				Result := a_edge.opposite_node (a_node)
+			end
 		end
 
 end -- class UNDIRECTED_GRAPH

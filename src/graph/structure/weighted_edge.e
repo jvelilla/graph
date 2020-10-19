@@ -29,7 +29,7 @@ create
 
 feature -- Initialization
 
-	make (a_start_node, a_end_node: G; a_label: L; a_weight: REAL_64)
+	make (a_start_node, a_end_node: G; a_label: detachable L; a_weight: REAL_64)
 			-- Make a labeled edge from two nodes with weight `a_weight'.
 		require
 			nodes_not_void: a_start_node /= Void and a_end_node /= Void
@@ -49,7 +49,7 @@ feature -- Initialization
 			default_weight_function: not user_defined_weight_function
 		end
 
-	make_directed (a_start_node, a_end_node: G; a_label: L; a_weight: REAL_64)
+	make_directed (a_start_node, a_end_node: G; a_label: detachable L; a_weight: REAL_64)
 			-- Make a directed labeled edge from two nodes with weight `a_weight'.
 		require
 			nodes_not_void: a_start_node /= Void and a_end_node /= Void
@@ -66,7 +66,7 @@ feature -- Initialization
 			is_directed: is_directed
 		end
 
-	make_undirected (a_start_node, a_end_node: G; a_label: L; a_weight: REAL_64)
+	make_undirected (a_start_node, a_end_node: G; a_label: detachable L; a_weight: REAL_64)
 			-- Make an undirected labeled edge from two nodes with weight `a_weight'.
 		require
 			nodes_not_void: a_start_node /= Void and a_end_node /= Void
@@ -88,10 +88,10 @@ feature -- Access
 	weight: REAL_64
 			-- Weight of the edge
 		do
-			if not user_defined_weight_function then
-				Result := internal_weight
+			if attached weight_function as l_weight_function then
+				Result := l_weight_function.item ([Current])
 			else
-				Result := weight_function.item ([Current])
+				Result := internal_weight
 			end
 		end
 
@@ -127,19 +127,19 @@ feature -- Comparison
 			-- Is `other' attached to an object considered
 			-- equal to current object?
 		do
-			-- Start and end node must be equal.
+				-- Start and end node must be equal.
 			Result := start_node.is_equal (other.start_node) and
 					  end_node.is_equal (other.end_node)
 
-			-- Consider also flipped edges in undirected graphs.
+				-- Consider also flipped edges in undirected graphs.
 			if not is_directed then
 				Result := Result or
 						 (start_node.is_equal (other.end_node) and
 						  end_node.is_equal (other.start_node))
 			end
-			-- Labels must be equal.
-			Result := Result and equal (label, other.label)
-			-- Weight must be equal.
+				-- Labels must be equal.
+			Result := Result and equal (attached  {ANY} label as l_label, attached {ANY} other.label as o_label)
+				-- Weight must be equal.
 			Result := Result and weight = other.weight
 			Result := Result or standard_is_equal (other)
 		end
@@ -184,10 +184,12 @@ feature -- Output
 				Result.append (" -- ")
 			end
 			Result.append (end_node.out)
-			if label /= Void and then not label.out.is_equal ("")  then
-				Result.append ("  [label=%"")
-				Result.append (label.out)
-				Result.append ("%"]")
+			separate label as s_label do
+				if attached s_label as l_label and then not l_label.out.is_equal ("")  then
+					Result.append ("  [label=%"")
+					Result.append ((create {STRING}.make_from_separate (l_label.out)).out)
+					Result.append ("%"]")
+				end
 			end
 			Result.append ("  [weight=")
 			Result.append (weight.out)
@@ -199,7 +201,7 @@ feature {NONE} -- Implementation
 	internal_weight: REAL_64
 			-- Weight of the edge
 
-	weight_function: FUNCTION [ANY, TUPLE [WEIGHTED_EDGE [G, L]], REAL_64]
+	weight_function: detachable FUNCTION [TUPLE [WEIGHTED_EDGE [G, L]], REAL_64]
 			-- User-defined function to compute `weight'.
 
 end -- class WEIGHTED_EDGE

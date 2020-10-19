@@ -10,7 +10,7 @@ note
 	revision: "$Revision: 1133 $"
 
 class
-	ADJACENCY_MATRIX_UNDIRECTED_WEIGHTED_GRAPH [G -> HASHABLE, reference L]
+	ADJACENCY_MATRIX_UNDIRECTED_WEIGHTED_GRAPH [G -> HASHABLE, L]
 
 inherit
 	ADJACENCY_MATRIX_UNDIRECTED_GRAPH [G, L]
@@ -95,7 +95,7 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put_edge (a_start_node, a_end_node: G; a_label: L; a_weight: REAL_64) 
+	put_edge (a_start_node, a_end_node: G; a_label: detachable L; a_weight: REAL_64)
 			-- Create an edge with weight `a_weight' between `a_start_node' and `a_end_node'.
 			-- The edge will be labeled `a_label'.
 			-- The cursor is not moved.
@@ -143,7 +143,7 @@ feature -- Output
 		local
 			i, j: INTEGER
 			node: G
-			label: ANY
+			label: L
 			edge: WEIGHTED_EDGE [G, L]
 		do
 			Result := "graph adjacency_matrix_graph%N"
@@ -172,9 +172,11 @@ feature -- Output
 						Result.append (node_array.item (j).out)
 						Result.append ("%" [label=%"")
 						label := edge.label
-						if label /= Void and then not label.out.is_equal ("") then
-							Result.append (label.out)
-							Result.append ("\n")
+						separate label as s_label do
+							if attached s_label as ls_label and then not ls_label.out.is_equal ("") then
+								Result.append (create {STRING}.make_from_separate (ls_label.out))
+								Result.append ("\n")
+							end
 						end
 						Result.append ("w = ")
 						Result.append (edge.weight.out)
