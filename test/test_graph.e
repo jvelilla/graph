@@ -91,14 +91,18 @@ feature -- Test routines
 				-- BFS walker
 			print ("%NBFS walker")
 			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
-			loop
-				print ("%NCurrent item: " + l_bfs.item)
+--			from
+--				l_bfs.start
+--			until
+--				l_bfs.after
+--			loop
+--				print ("%NCurrent item: " + l_bfs.item)
+--				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
+--				l_bfs.forth
+--			end
+			across l_bfs as ic loop
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_bfs.forth
 			end
 			io.put_new_line
 
