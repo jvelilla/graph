@@ -42,10 +42,7 @@ inherit
 		end
 
 	GRAPH_ITERABLE [G]
-		undefine
-			 changeable_comparison_criterion_graph,
-			 has
-		end
+
 	WALKABLE [G]
 		rename
 			has as has_node,
@@ -54,9 +51,6 @@ inherit
 			turn_to as turn_to_target
 		redefine
 			item,
-			changeable_comparison_criterion
-		select
-			has_node,
 			changeable_comparison_criterion
 		end
 
