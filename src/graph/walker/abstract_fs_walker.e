@@ -25,7 +25,7 @@ feature -- Initialization
 			non_void: g /= Void
 			graph_not_off: not g.off
 		do
-			graph := g
+			graph := g.twin
 			first_node := g.cursor
 			create_dispenser
 			create visited_nodes.make (g.node_count)
