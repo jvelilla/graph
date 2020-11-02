@@ -7,7 +7,7 @@ note
 	]"
 	author: "Olivier Jeger, based on an initial design by Bernd Schoeller"
 	license: "Eiffel Forum License v2 (see forum.txt)"
-	date: "$Date: 2010-09-02 14:36:41 +0200 (Чт, 02 сен 2010) $"
+	date: "$Date: 2010-09-02 14:36:41 +0200 (Ч�%/130/, 02 �%/129/ен 2010) $"
 	revision: "$Revision: 1134 $"
 
 deferred class
@@ -80,26 +80,26 @@ feature -- Cursor movement
 			else
 				from
 					graph.go_to (dispenser.item)
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+						----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 					debug ("walker")
 						print ("WALKER: am at item `")
 						print (graph.item)
 						print ("'%N")
 					end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+						----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 					dispenser.remove
 				until
 					(not visited_nodes.has (graph.node_identity)) or
 					dispenser.is_empty
 				loop
 					graph.go_to (dispenser.item)
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+						----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 					debug ("walker")
 						print ("WALKER: am at item `")
 						print (graph.item)
 						print ("'%N")
 					end
------ DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+						----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
 					dispenser.remove
 				end
 				after := visited_nodes.has (graph.node_identity)

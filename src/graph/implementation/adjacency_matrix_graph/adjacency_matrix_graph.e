@@ -28,7 +28,13 @@ inherit
 			out
 		end
 
-	ITERATION_CURSOR [G]
+	GRAPH_ITERATION_CURSOR [G, L]
+		rename
+			item as item_cursor,
+			after as after_cursor,
+			forth as forth_cursor,
+			is_empty as is_empty_cursor,
+			start as start_cursor
 		undefine
 			out
 		end

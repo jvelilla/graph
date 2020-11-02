@@ -41,8 +41,6 @@ inherit
 			changeable_comparison_criterion
 		end
 
-	GRAPH_ITERABLE [G]
-
 	WALKABLE [G]
 		rename
 			has as has_node,
@@ -708,7 +706,33 @@ feature -- Status report
 			end
 		end
 
+	is_depth_first: BOOLEAN
+			-- Is depth first search order?
+		do
+			Result := not is_breadth_first
+		end
+
+	is_breadth_first: BOOLEAN
+			-- Is breadth first search order?
+
 feature -- Cursor movement
+
+	iterate_breadth_first
+			-- breadth first search order.
+		do
+			is_breadth_first := True
+		ensure
+			is_breadh_first_set: is_breadth_first
+		end
+
+	iterate_depth_first
+			-- depth first search order.
+		do
+			is_breadth_first := False
+		ensure
+			is_depth_first_set: not is_breadth_first
+		end
+
 
 	initialize
 			-- Set the current_node to the first node in the set of nodes if not empty
