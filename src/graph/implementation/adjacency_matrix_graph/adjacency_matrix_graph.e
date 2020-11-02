@@ -390,6 +390,12 @@ feature -- New Cursor
 
 feature -- Cursor movement
 
+	initialize
+		do
+			 current_node_index := if node_array.is_empty then - 1 else 1 end
+		end
+
+
 	start
 			-- Turn to the first link.
 		do

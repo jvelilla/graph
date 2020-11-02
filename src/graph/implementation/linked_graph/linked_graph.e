@@ -367,6 +367,14 @@ feature -- New Cursor
 
 feature -- Cursor movement
 
+	initialize
+		do
+			if node_count > 0 and then attached node_list.at (1) as l_node then
+				search (l_node.item)
+			end
+
+		end
+
 	start
 			-- Turn to the first link.
 		do

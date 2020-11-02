@@ -710,6 +710,11 @@ feature -- Status report
 
 feature -- Cursor movement
 
+	initialize
+			-- Set the current_node to the first node in the set of nodes if not empty
+		deferred
+		end
+
 	start
 			-- Turn to the first link.
 		deferred
@@ -1177,8 +1182,7 @@ feature {NONE} -- Implementation
 
 	history_stack: ARRAYED_STACK [like cursor]
 			-- History of the visited nodes
-
-		-- Implementation for path finding algorithm
+			-- Implementation for path finding algorithm
 
 	annotated_nodes: detachable ARRAY [NODE [like item, L]]
 			-- All graph nodes annotated with additional information
