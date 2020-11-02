@@ -388,9 +388,10 @@ feature -- Status setting
 
 feature -- New Cursor
 
-	new_cursor: ADJACENCY_MATRIX_GRAPH [G, L]
+	new_cursor: GRAPH_ITERATION_CURSOR [G,L]
 		do
-			Result := twin
+			Current.initialize
+			create Result.make (Current)
 			Result.start
 		end
 
@@ -398,7 +399,9 @@ feature -- Cursor movement
 
 	initialize
 		do
-			 current_node_index := if node_array.is_empty then - 1 else 1 end
+			if node_count > 0 and then attached node_array.at (1) as l_node then
+				search (l_node)
+			end
 		end
 
 
