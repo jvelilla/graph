@@ -79,6 +79,8 @@ feature -- Test routines
 			l_graph.put_edge ("b", "c", "b-c")
 			l_graph.put_edge ("c", "d", "c-d")
 
+			l_graph.search ("a")
+
 				-- By default depth first search
 			create l_dfs.make (4)
 			across l_graph as ic loop
@@ -87,6 +89,7 @@ feature -- Test routines
 			create l_dfs_result.make_from_array (<<"a", "c", "d", "b">>)
 			l_dfs_result.compare_objects
 			assert ("Expected all dfs items ", ∀ i: l_dfs ¦ l_dfs_result.has (i))
+
 
 				-- Set breadth first
 			l_graph.iterate_breadth_first

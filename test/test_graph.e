@@ -21,17 +21,17 @@ feature -- Test routines
 			print ("Build undirected graph with STRINGs%N")
 			test_build_undirected_graph_string
 
-			print ("Build undirected graph with STRINGs and Labels%N")
-			test_build_undirected_graph_string_with_labels
+				--			print ("Build undirected graph with STRINGs and Labels%N")
+				--			test_build_undirected_graph_string_with_labels
 
-			print ("Build adj matrix undirected graph with STRINGs and Labels%N")
-			test_build_undirected_matrix_graph_string_with_labels
+				--			print ("Build adj matrix undirected graph with STRINGs and Labels%N")
+				--			test_build_undirected_matrix_graph_string_with_labels
 
-			print ("Build adj matrix  graph with STRINGs and Labels%N")
-			test_build_matrix_graph_string_with_labels
+				--			print ("Build adj matrix  graph with STRINGs and Labels%N")
+				--			test_build_matrix_graph_string_with_labels
 
-			print ("Build undirected graph with STRINGs and Labels Integer%N")
-			test_build_undirected_graph_string_with_labels_integer
+				--			print ("Build undirected graph with STRINGs and Labels Integer%N")
+				--			test_build_undirected_graph_string_with_labels_integer
 		end
 
 	test_build_undirected_graph_string_with_labels
@@ -422,7 +422,10 @@ feature -- Test routines
 			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, NONE]
 			l_bfs: BFS_WALKER [STRING, NONE]
 			l_dfs: DFS_WALKER [STRING, NONE]
+			it2: GRAPH_ITERATION_CURSOR2 [STRING, NONE]
+			it: GRAPH_ITERATION_CURSOR [STRING, NONE]
 		do
+
 				-- Create the graph
 			create l_graph.make_simple_graph
 
@@ -438,6 +441,13 @@ feature -- Test routines
 			l_graph.put_unlabeled_edge ("a", "c")
 			l_graph.put_unlabeled_edge ("b", "c")
 			l_graph.put_unlabeled_edge ("c", "d")
+
+			l_graph.search ("a")
+			create it2.make (l_graph)
+			it2.finish
+
+				--			create it.make (l_graph)
+				--			it.finish
 
 			check
 				has_cycles: l_graph.has_cycles
@@ -486,6 +496,16 @@ feature -- Test routines
 			end
 			io.put_new_line
 
+			print ("%NBFS Iterator")
+			create l_bfs.make (l_graph)
+
+			l_graph.search ("a")
+			l_graph.iterate_breadth_first
+			across l_graph as ic loop
+				print ("%NCurrent item: " + ic.item)
+				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
+			end
+
 			l_graph.search ("a")
 			check
 				exits: not l_graph.off
@@ -502,6 +522,14 @@ feature -- Test routines
 				print ("%NCurrent item: " + l_dfs.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
 				l_dfs.forth
+			end
+
+				-- Iterator DFS walker
+			print ("%NDFS Iterator")
+			l_graph.iterate_depth_first
+			across l_graph as ic loop
+				print ("%NCurrent item: " + ic.item)
+				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
 			end
 			print ("%N=============================")
 

@@ -388,11 +388,9 @@ feature -- Status setting
 
 feature -- New Cursor
 
-	new_cursor: GRAPH_ITERATION_CURSOR [G,L]
+	new_cursor: GRAPH_ITERATION_CURSOR2 [G,L]
 		do
-			Current.initialize
 			create Result.make (Current)
-			Result.start
 		end
 
 feature -- Cursor movement

@@ -4,7 +4,7 @@ note
 	revision: "$Revision$"
 
 class
-	GRAPH_ITERATION_CURSOR [G -> HASHABLE, L]
+	GRAPH_ITERATION_CURSOR2 [G -> HASHABLE, L]
 
 inherit
 
@@ -23,7 +23,6 @@ feature -- Initialization
 			graph_not_off: not g.off
 		do
 			graph := g
-			first_node := g.cursor
 			create_dispenser
 			create visited_nodes.make (g.node_count)
 			start
@@ -49,6 +48,7 @@ feature -- Access
 				Result := l_graph.item
 			end
 		end
+			-- Current graph node
 
 	index_cursor: INTEGER
 			-- Index of current position
@@ -68,60 +68,52 @@ feature -- Cursor movement
 		do
 			if graph /= Void and then
 				dispenser /= Void and then
-				visited_nodes /= Void and then
-				first_node /= Void
+				visited_nodes /= Void
 			then
-				graph.go_to (first_node)
 				index_cursor := 1
 				visited_nodes.wipe_out
 				visited_nodes.put (True, graph.node_identity)
 				dispenser.wipe_out
-				add_targets_to_dispenser
+				dispenser.extend (item)
 				after := False
 			end
 		end
 
 	forth
 			-- Move the cursor to the next item
+		local
+			cursor: like graph.cursor
 		do
 			if visited_nodes /= Void and then
 				dispenser /= Void and then
 				graph /= Void
 			then
+					-- Record current node cursor
+				cursor := graph.cursor
 				if dispenser.is_empty then
 					after := True
 				else
 					from
-						graph.go_to (dispenser.item)
-							----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
-						debug ("walker")
-							print ("WALKER: am at item `")
-							print (graph.item)
-							print ("'%N")
-						end
-							----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
-						dispenser.remove
 					until
 						(not visited_nodes.has (graph.node_identity)) or
 						dispenser.is_empty
 					loop
-						graph.go_to (dispenser.item)
-							----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
-						debug ("walker")
-							print ("WALKER: am at item `")
-							print (graph.item)
-							print ("'%N")
-						end
-							----- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG --- DEBUG -----
+						graph.search (dispenser.item)
 						dispenser.remove
+						across graph.neighbors as ic loop
+							if not visited_nodes.has (ic.item) then
+								dispenser.extend (ic.item)
+							end
+						end
 					end
 					after := visited_nodes.has (graph.node_identity)
 					if not after then
 						visited_nodes.put (True, graph.node_identity)
-						add_targets_to_dispenser
 						index_cursor := index_cursor + 1
 					end
 				end
+					-- Restore current node cursor.
+				graph.go_to (cursor)
 			end
 		end
 
@@ -131,7 +123,7 @@ feature -- Cursor movement
 			from
 				start
 			until
-				after or next_will_be_after
+				after
 			loop
 				forth
 			end
@@ -139,14 +131,7 @@ feature -- Cursor movement
 
 feature {NONE} -- Implementation
 
-	first_node: detachable GRAPH_CURSOR [G, L]
-			-- Node to start the walk on
-		note
-			option: stable
-		attribute
-		end
-
-	dispenser: detachable DISPENSER [GRAPH_CURSOR [G, L]]
+	dispenser: detachable DISPENSER [G]
 			-- Storage of items that need to be processed
 		note
 			option: stable
@@ -167,60 +152,13 @@ feature {NONE} -- Implementation
 		do
 			if graph /= Void then
 				if graph.is_depth_first then
-					create {LINKED_STACK [GRAPH_CURSOR [G, L]]} dispenser.make
+					create {LINKED_STACK [G]} dispenser.make
 				else
-					create {LINKED_QUEUE [GRAPH_CURSOR [G, L]]} dispenser.make
+					create {LINKED_QUEUE [G]} dispenser.make
 				end
+				dispenser.compare_objects
 			end
-		end
 
-	add_targets_to_dispenser
-			-- Add all targets of the current node to the dispenser
-		require
-			not_off_graph: attached graph as l_graph implies not l_graph.off
-		do
-			if graph /= Void and then
-				dispenser /= Void
-			then
-				from
-					graph.start
-				until
-					graph.exhausted
-				loop
-					dispenser.extend (graph.target_cursor)
-					graph.left
-				end
-			end
-		end
-
-	next_will_be_after: BOOLEAN
-			-- Will the next forth result in an after ?
-			-- (all items in the dispenser are already visited)
-		local
-			oldpos: GRAPH_CURSOR [G, L]
-			linear: LINEAR [GRAPH_CURSOR [G, L]]
-		do
-			if visited_nodes /= Void and then
-				graph /= Void and then
-				dispenser /= Void
-			then
-				oldpos := graph.cursor
-				linear := dispenser.linear_representation
-				Result := True
-				from
-					linear.start
-				until
-					linear.after or not Result
-				loop
-					graph.go_to (linear.item)
-					if
-						not visited_nodes.has (graph.node_identity)
-					then
-						Result := False
-					end
-				end
-				graph.go_to (oldpos)
-			end
 		end
 
 end
