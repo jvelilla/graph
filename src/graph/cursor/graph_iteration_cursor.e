@@ -98,6 +98,7 @@ feature -- Cursor movement
 feature {NONE} -- Implementation
 
 	nodes: ARRAYED_SET [like item]
+			-- Set of nodes to be traversed.
 
 	dispenser: DISPENSER [G]
 			-- Storage of items that need to be processed

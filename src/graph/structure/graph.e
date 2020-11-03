@@ -236,6 +236,7 @@ feature -- Access
 			-- All neighbor nodes of `item'
 		require
 			not_off: not off
+			has_node: has_node (a_item)
 		local
 			c: like cursor
 		do
@@ -348,6 +349,8 @@ feature -- Measurement
 
 	out_degree_of (a_item: like item): INTEGER
 			-- Number of outgoing edges of `a_item'
+		require
+			has_node: has_node (a_item)
 		local
 			c: like cursor
 		do
