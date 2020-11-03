@@ -422,10 +422,8 @@ feature -- Test routines
 			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, NONE]
 			l_bfs: BFS_WALKER [STRING, NONE]
 			l_dfs: DFS_WALKER [STRING, NONE]
-			it2: GRAPH_ITERATION_CURSOR2 [STRING, NONE]
-			it: GRAPH_ITERATION_CURSOR [STRING, NONE]
+			it2: GRAPH_ITERATION_CURSOR [STRING, NONE]
 		do
-
 				-- Create the graph
 			create l_graph.make_simple_graph
 
@@ -442,14 +440,20 @@ feature -- Test routines
 			l_graph.put_unlabeled_edge ("b", "c")
 			l_graph.put_unlabeled_edge ("c", "d")
 
+			print ("%NIterator DFS%N")
 			l_graph.search ("a")
 			across l_graph as ic loop
 				print (ic.item)
 			end
 			check  Expected_item_a: l_graph.item.is_equal ("a") end
 
-				--			create it.make (l_graph)
-				--			it.finish
+			print ("%NIterator BFS%N")
+			l_graph.iterate_breadth_first
+			across l_graph as ic loop
+				print (ic.item)
+			end
+			check  Expected_item_a: l_graph.item.is_equal ("a") end
+			io.put_new_line
 
 			check
 				has_cycles: l_graph.has_cycles

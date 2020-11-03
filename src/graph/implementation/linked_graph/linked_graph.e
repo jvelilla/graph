@@ -26,17 +26,6 @@ inherit
 			out
 		end
 
-	GRAPH_ITERATION_CURSOR [G, L]
-		rename
-			item as item_cursor,
-			after as after_cursor,
-			forth as forth_cursor,
-			is_empty as is_empty_cursor,
-			start as start_cursor
-		undefine
-			out
-		end
-
 create
 	make_simple_graph,
 	make_symmetric_graph,
@@ -367,7 +356,7 @@ feature -- Status report
 feature -- New Cursor
 
 	--new_cursor: GRAPH_ITERATION_CURSOR [G,L]
-	new_cursor: GRAPH_ITERATION_CURSOR2 [G,L]
+	new_cursor: GRAPH_ITERATION_CURSOR [G,L]
 		do
 			create Result.make (Current)
 		end

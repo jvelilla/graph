@@ -224,7 +224,6 @@ feature -- Access
 				Result.put (target)
 				left
 			end
-
 				-- Restore cursor.
 			go_to (c)
 		ensure
@@ -232,6 +231,25 @@ feature -- Access
 			simple_graph_neighbors: is_simple_graph implies Result.count = out_degree
 			multi_graph_neighbors: is_multi_graph implies Result.count <= out_degree
 		end
+
+	neighbors_of (a_item: like item): SET [like item]
+			-- All neighbor nodes of `item'
+		require
+			not_off: not off
+		local
+			c: like cursor
+		do
+			c := cursor
+			search (a_item)
+			Result := neighbors
+				-- Restore cursor.
+			go_to (c)
+		ensure
+			result_not_void: Result /= Void
+			simple_graph_neighbors: is_simple_graph implies Result.count = out_degree_of (a_item)
+			multi_graph_neighbors: is_multi_graph implies Result.count <= out_degree_of (a_item)
+		end
+
 
 	edge_from_values (a_start_node, a_end_node: like item; a_label: L): detachable EDGE [like item, L]
 			-- Edge that matches `a_start_node', `a_end_node' and `a_label'.
@@ -327,6 +345,21 @@ feature -- Measurement
 			same_direction: equal (edge_item, old edge_item)
 			valid_degree: Result >= 0
 		end
+
+	out_degree_of (a_item: like item): INTEGER
+			-- Number of outgoing edges of `a_item'
+		local
+			c: like cursor
+		do
+				-- Backup cursor
+			c := cursor
+			search (a_item)
+			Result := out_degree
+			go_to (c)
+		ensure then
+			valid_degree: Result >= 0
+		end
+
 
 	components: INTEGER
 			-- Number of (weakly) connected components of the graph

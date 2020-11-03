@@ -86,10 +86,9 @@ feature -- Test routines
 			across l_graph as ic loop
 				l_dfs.force (ic.item)
 			end
-			create l_dfs_result.make_from_array (<<"a", "c", "d", "b">>)
+			create l_dfs_result.make_from_array (<<"a", "c", "b", "d">>)
 			l_dfs_result.compare_objects
 			assert ("Expected all dfs items ", ∀ i: l_dfs ¦ l_dfs_result.has (i))
-
 
 				-- Set breadth first
 			l_graph.iterate_breadth_first
@@ -102,7 +101,6 @@ feature -- Test routines
 			l_bfs_result.compare_objects
 			assert ("Expected all dfs items ", ∀ i: l_bfs ¦ l_bfs_result.has (i))
 
-
 			create l_dfs.make (4)
 			across l_graph as ic loop
 					-- Set breadth first
@@ -113,15 +111,11 @@ feature -- Test routines
 				end
 				l_dfs.force (ic.item)
 			end
-			create l_dfs_result.make_from_array (<<"a", "c", "d", "b">>)
 			l_dfs_result.compare_objects
 			assert ("Expected all dfs items ", ∀ i: l_dfs ¦ l_dfs_result.has (i))
 
-			create l_bfs_result.make_from_array (<<"a", "b", "c", "d">>)
 			l_bfs_result.compare_objects
 			assert ("Expected all dfs items ", ∀ i: l_bfs ¦ l_bfs_result.has (i))
-
-
 
 		end
 
