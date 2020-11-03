@@ -60,7 +60,7 @@ feature -- Cursor movement
 			-- Move the cursor back to the start
 		do
 			index_cursor := 1
-			target_index := 1
+			target_index := nodes.index_of (graph.item, 1)
 			visited_nodes.wipe_out
 			visited_nodes.put (True, nodes.at (target_index))
 			dispenser.wipe_out
