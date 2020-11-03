@@ -13,10 +13,10 @@ inherit
 create
 	make
 
-feature -- Initialization
+feature {NONE} -- Initialization
 
 	make (g: GRAPH [G, L])
-			-- Create a new walker that is walking on `g'. The starting position
+			-- Create a new iteration cursor that is walking on `g'. The starting position
 			-- of the walker is the current node of the graph.
 		require
 			non_void: g /= Void
@@ -24,18 +24,25 @@ feature -- Initialization
 		do
 			graph := g
 			create_dispenser
+			first_node := g.cursor
 			create visited_nodes.make (g.node_count)
 			start
 		ensure
 			item_set: item = g.item
 		end
 
-feature {NONE} -- Initialization
-
 feature -- Access
 
+	first_node: detachable GRAPH_CURSOR [G, L]
+			-- Current node cursor
+		note
+			option: stable
+		attribute
+		end
+
+
 	graph: detachable GRAPH [G, L]
-			-- The graph the walker is processing
+			-- The graph the iterator is processing
 		note
 			option: stable
 		attribute
@@ -48,12 +55,9 @@ feature -- Access
 				Result := l_graph.item
 			end
 		end
-			-- Current graph node
 
 	index_cursor: INTEGER
 			-- Index of current position
-
-feature -- Measurement
 
 feature -- Status report
 
@@ -86,12 +90,13 @@ feature -- Cursor movement
 		do
 			if visited_nodes /= Void and then
 				dispenser /= Void and then
+				first_node /= Void and then
 				graph /= Void
 			then
-					-- Record current node cursor
-				cursor := graph.cursor
 				if dispenser.is_empty then
 					after := True
+						-- Restore current node cursor.
+					graph.go_to (first_node)
 				else
 					from
 					until
@@ -110,22 +115,11 @@ feature -- Cursor movement
 					if not after then
 						visited_nodes.put (True, graph.node_identity)
 						index_cursor := index_cursor + 1
+					else
+							-- Restore current node cursor.
+						graph.go_to (first_node)
 					end
 				end
-					-- Restore current node cursor.
-				graph.go_to (cursor)
-			end
-		end
-
-	finish
-			-- Move the cursor to the last item
-		do
-			from
-				start
-			until
-				after
-			loop
-				forth
 			end
 		end
 
@@ -148,7 +142,7 @@ feature {NONE} -- Implementation
 	create_dispenser
 			-- Create the dispenser
 			--		as a queue for the BFS Walker
-			--      as a stask for a DFS walker
+			--		as a stask for a DFS walker
 		do
 			if graph /= Void then
 				if graph.is_depth_first then

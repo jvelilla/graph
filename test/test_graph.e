@@ -443,8 +443,10 @@ feature -- Test routines
 			l_graph.put_unlabeled_edge ("c", "d")
 
 			l_graph.search ("a")
-			create it2.make (l_graph)
-			it2.finish
+			across l_graph as ic loop
+				print (ic.item)
+			end
+			check  Expected_item_a: l_graph.item.is_equal ("a") end
 
 				--			create it.make (l_graph)
 				--			it.finish
