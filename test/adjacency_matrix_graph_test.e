@@ -83,39 +83,44 @@ feature -- Test routines
 
 				-- By default depth first search
 			create l_dfs.make (4)
+			l_dfs.compare_objects
 			across l_graph as ic loop
 				l_dfs.force (ic.item)
 			end
-			create l_dfs_result.make_from_array (<<"a", "c", "b", "d">>)
+			create l_dfs_result.make_from_array (<<"a", "c", "d", "b">>)
 			l_dfs_result.compare_objects
-			assert ("Expected all dfs items ", ∀ i: l_dfs ¦ l_dfs_result.has (i))
+			assert ("Expected same list dfs", l_dfs_result.is_equal (l_dfs))
 
 				-- Set breadth first
 			l_graph.iterate_breadth_first
 			create l_bfs.make (4)
+			l_bfs.compare_objects
 			across l_graph as ic loop
 				l_bfs.force (ic.item)
 			end
 
 			create l_bfs_result.make_from_array (<<"a", "b", "c", "d">>)
 			l_bfs_result.compare_objects
-			assert ("Expected all dfs items ", ∀ i: l_bfs ¦ l_bfs_result.has (i))
+			assert ("Expected same list bfs", l_bfs_result.is_equal (l_bfs))
 
 			create l_dfs.make (4)
+			create l_bfs.make (4)
+			l_dfs.compare_objects
+
+			l_graph.iterate_depth_first
 			across l_graph as ic loop
 					-- Set breadth first
 				l_graph.iterate_breadth_first
 				create l_bfs.make (4)
+				l_bfs.compare_objects
 				across l_graph as ic2 loop
 					l_bfs.force (ic2.item)
 				end
+				assert ("Expected same list bfs", l_bfs_result.is_equal (l_bfs))
 				l_dfs.force (ic.item)
 			end
-			l_dfs_result.compare_objects
-			assert ("Expected all dfs items ", ∀ i: l_dfs ¦ l_dfs_result.has (i))
 
-			l_bfs_result.compare_objects
-			assert ("Expected all dfs items ", ∀ i: l_bfs ¦ l_bfs_result.has (i))
+			assert ("Expected same list dfs", l_dfs_result.is_equal (l_dfs))
 
 		end
 

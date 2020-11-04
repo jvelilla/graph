@@ -14,3 +14,4 @@ Converting existing library (part of [Traffic3](https://github.com/eiffelhub/Tra
 	Complete Void Safety.
 	Expanded types can be used for Labels.
 	Added test cases.
+	Added GRAPH_ITERATION_CURSOR external iteration cursor used by `across...loop...end' for Graphs.
