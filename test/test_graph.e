@@ -18,20 +18,26 @@ feature -- Test routines
 	make
 			-- New test routine
 		do
+			print ("Test Depth first search%N")
+			test_dfs
+
+			print ("Test Breadth first search%N")
+			test_bfs
+
 			print ("Build undirected graph with STRINGs%N")
 			test_build_undirected_graph_string
 
-				--			print ("Build undirected graph with STRINGs and Labels%N")
-				--			test_build_undirected_graph_string_with_labels
+			print ("Build undirected graph with STRINGs and Labels%N")
+			test_build_undirected_graph_string_with_labels
 
-				--			print ("Build adj matrix undirected graph with STRINGs and Labels%N")
-				--			test_build_undirected_matrix_graph_string_with_labels
+			print ("Build adj matrix undirected graph with STRINGs and Labels%N")
+			test_build_undirected_matrix_graph_string_with_labels
 
-				--			print ("Build adj matrix  graph with STRINGs and Labels%N")
-				--			test_build_matrix_graph_string_with_labels
+			print ("Build adj matrix  graph with STRINGs and Labels%N")
+			test_build_matrix_graph_string_with_labels
 
-				--			print ("Build undirected graph with STRINGs and Labels Integer%N")
-				--			test_build_undirected_graph_string_with_labels_integer
+			print ("Build undirected graph with STRINGs and Labels Integer%N")
+			test_build_undirected_graph_string_with_labels_integer
 		end
 
 	test_build_undirected_graph_string_with_labels
@@ -445,14 +451,14 @@ feature -- Test routines
 			across l_graph as ic loop
 				print (ic.item)
 			end
-			check  Expected_item_a: l_graph.item.is_equal ("a") end
+			check Expected_item_a: l_graph.item.is_equal ("a") end
 
 			print ("%NIterator BFS%N")
 			l_graph.iterate_breadth_first
 			across l_graph as ic loop
 				print (ic.item)
 			end
-			check  Expected_item_a: l_graph.item.is_equal ("a") end
+			check Expected_item_a: l_graph.item.is_equal ("a") end
 			io.put_new_line
 
 			check
@@ -538,6 +544,92 @@ feature -- Test routines
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
 			end
 			print ("%N=============================")
+
+		end
+
+
+	test_dfs
+		local
+			l_graph: LINKED_UNDIRECTED_GRAPH [INTEGER, NONE]
+		do
+				--  (8) -- (0) -- (1) -- (7)
+				--   |      |             |
+				--  (4) -- (3) ----------(2) -- (5)---(6)
+			create l_graph.make_simple_graph
+
+				-- Add nodes
+			l_graph.put_node (0)
+			l_graph.put_node (1)
+			l_graph.put_node (2)
+			l_graph.put_node (3)
+			l_graph.put_node (4)
+			l_graph.put_node (5)
+			l_graph.put_node (6)
+			l_graph.put_node (7)
+			l_graph.put_node (8)
+
+				-- Add edges
+			l_graph.put_unlabeled_edge (0, 1)
+			l_graph.put_unlabeled_edge (0, 3)
+			l_graph.put_unlabeled_edge (0, 8)
+			l_graph.put_unlabeled_edge (1, 7)
+			l_graph.put_unlabeled_edge (3, 2)
+			l_graph.put_unlabeled_edge (3, 4)
+			l_graph.put_unlabeled_edge (8, 4)
+			l_graph.put_unlabeled_edge (2, 5)
+			l_graph.put_unlabeled_edge (2, 7)
+			l_graph.put_unlabeled_edge (5, 6)
+
+				-- Start at node 0
+			l_graph.search (0)
+
+				-- DFS by default
+			across l_graph as ic loop
+				print (ic.item)
+			end
+
+		end
+
+
+	test_bfs
+		local
+			l_graph: LINKED_UNDIRECTED_GRAPH [INTEGER, NONE]
+		do
+				--  (8) -- (0) -- (1) -- (7)
+				--   |      |             |
+				--  (4) -- (3) ----------(2) -- (5)---(6)
+			create l_graph.make_simple_graph
+
+				-- Add nodes
+			l_graph.put_node (0)
+			l_graph.put_node (1)
+			l_graph.put_node (2)
+			l_graph.put_node (3)
+			l_graph.put_node (4)
+			l_graph.put_node (5)
+			l_graph.put_node (6)
+			l_graph.put_node (7)
+			l_graph.put_node (8)
+
+				-- Add edges
+			l_graph.put_unlabeled_edge (0, 1)
+			l_graph.put_unlabeled_edge (0, 3)
+			l_graph.put_unlabeled_edge (0, 8)
+			l_graph.put_unlabeled_edge (1, 7)
+			l_graph.put_unlabeled_edge (3, 2)
+			l_graph.put_unlabeled_edge (3, 4)
+			l_graph.put_unlabeled_edge (8, 4)
+			l_graph.put_unlabeled_edge (2, 5)
+			l_graph.put_unlabeled_edge (2, 7)
+			l_graph.put_unlabeled_edge (5, 6)
+
+				-- Start at node 0
+			l_graph.search (0)
+
+			l_graph.iterate_breadth_first
+			across l_graph as ic loop
+				print (ic.item)
+			end
 
 		end
 
