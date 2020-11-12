@@ -28,11 +28,6 @@ inherit
 			out
 		end
 
-	ITERATION_CURSOR [G]
-		undefine
-			out
-		end
-
 create
 	make_simple_graph, make_symmetric_graph
 
@@ -382,19 +377,19 @@ feature -- Status setting
 
 feature -- New Cursor
 
-	new_cursor: ADJACENCY_MATRIX_GRAPH [G, L]
+	new_cursor: GRAPH_ITERATION_CURSOR [G, L]
 		do
-			Result := twin
-			Result.start
+			create Result.make (Current)
 		end
 
 feature -- Cursor movement
 
 	initialize
 		do
-			 current_node_index := if node_array.is_empty then - 1 else 1 end
+			if node_count > 0 and then attached node_array.at (1) as l_node then
+				search (l_node)
+			end
 		end
-
 
 	start
 			-- Turn to the first link.
@@ -684,7 +679,6 @@ feature -- Miscellaneous
 					-- Make new adjacency matrix and node array.
 				create new_matrix.make_filled (Void, node_count, node_count)
 				create new_node_array.make (1, node_count)
-
 
 				from
 					i := 1

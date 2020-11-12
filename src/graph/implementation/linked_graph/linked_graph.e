@@ -26,10 +26,6 @@ inherit
 			out
 		end
 
-	ITERATION_CURSOR [G]
-		undefine
-			out
-		end
 create
 	make_simple_graph,
 	make_symmetric_graph,
@@ -359,10 +355,10 @@ feature -- Status report
 
 feature -- New Cursor
 
-	new_cursor: LINKED_GRAPH [G, L]
+	--new_cursor: GRAPH_ITERATION_CURSOR [G,L]
+	new_cursor: GRAPH_ITERATION_CURSOR [G,L]
 		do
-			Result := twin
-			Result.start
+			create Result.make (Current)
 		end
 
 feature -- Cursor movement
@@ -424,7 +420,6 @@ feature -- Cursor movement
 				current_node := l_edge_item.internal_end_node
 				start
 			end
-
 		end
 
 	search (a_item: like item)

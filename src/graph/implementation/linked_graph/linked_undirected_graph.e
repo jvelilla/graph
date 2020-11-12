@@ -91,7 +91,6 @@ feature -- Access
 		do
 				-- Backup cursor
 			c := cursor
-
 			create {LINKED_SET [like item]} Result.make
 			from
 				start

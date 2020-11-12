@@ -3,8 +3,8 @@ note
 		Eiffel tests that can be executed by testing tool.
 	]"
 	author: "EiffelStudio test wizard"
-	date: "$Date$"
-	revision: "$Revision$"
+	date: "$Date: 2020-11-12 16:15:16 -0300 (Thu, 12 Nov 2020) $"
+	revision: "$Revision: 104864 $"
 	testing: "type/manual"
 
 class
@@ -18,6 +18,12 @@ feature -- Test routines
 	make
 			-- New test routine
 		do
+			print ("Test Depth first search%N")
+			test_dfs
+
+			print ("Test Breadth first search%N")
+			test_bfs
+
 			print ("Build undirected graph with STRINGs%N")
 			test_build_undirected_graph_string
 
@@ -37,8 +43,6 @@ feature -- Test routines
 	test_build_undirected_graph_string_with_labels
 		local
 			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, STRING]
-			l_bfs: BFS_WALKER [STRING, STRING]
-			l_dfs: DFS_WALKER [STRING, STRING]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -88,17 +92,18 @@ feature -- Test routines
 				end
 			end
 
+			across l_graph as ic loop
+				print ("%NCurrent item: " + ic.item)
+				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
+			end
+
 				-- BFS walker
 			print ("%NBFS walker")
-			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
+			l_graph.iterate_breadth_first
+			across l_graph as ic
 			loop
-				print ("%NCurrent item: " + l_bfs.item)
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_bfs.forth
 			end
 			io.put_new_line
 
@@ -109,15 +114,11 @@ feature -- Test routines
 
 				-- DFS walker
 			print ("%NDFS walker")
-			create l_dfs.make (l_graph)
-			from
-				l_dfs.start
-			until
-				l_dfs.after
+			l_graph.iterate_depth_first
+			across l_graph as ic
 			loop
-				print ("%NCurrent item: " + l_dfs.item)
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_dfs.forth
 			end
 			print ("%N=============================%N")
 
@@ -131,8 +132,6 @@ feature -- Test routines
 	test_build_undirected_matrix_graph_string_with_labels
 		local
 			l_graph: ADJACENCY_MATRIX_UNDIRECTED_GRAPH [STRING, STRING]
-			l_bfs: BFS_WALKER [STRING, STRING]
-			l_dfs: DFS_WALKER [STRING, STRING]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -184,15 +183,10 @@ feature -- Test routines
 
 				-- BFS walker
 			print ("%NBFS walker")
-			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
-			loop
-				print ("%NCurrent item: " + l_bfs.item)
+			l_graph.iterate_breadth_first
+			across l_graph as ic loop
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_bfs.forth
 			end
 			io.put_new_line
 
@@ -203,15 +197,11 @@ feature -- Test routines
 
 				-- DFS walker
 			print ("%NDFS walker")
-			create l_dfs.make (l_graph)
-			from
-				l_dfs.start
-			until
-				l_dfs.after
+			l_graph.iterate_depth_first
+			across l_graph as ic
 			loop
-				print ("%NCurrent item: " + l_dfs.item)
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_dfs.forth
 			end
 			print ("%N=============================%N")
 
@@ -225,8 +215,6 @@ feature -- Test routines
 	test_build_matrix_graph_string_with_labels
 		local
 			l_graph: ADJACENCY_MATRIX_GRAPH [STRING, STRING]
-			l_bfs: BFS_WALKER [STRING, STRING]
-			l_dfs: DFS_WALKER [STRING, STRING]
 		do
 				-- Create the graph
 			create l_graph.make_symmetric_graph
@@ -278,16 +266,11 @@ feature -- Test routines
 
 				-- BFS walker
 			print ("%NBFS walker")
-			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
-			loop
-				print ("%NCurrent item: " + l_bfs.item)
+			l_graph.iterate_breadth_first
+			across l_graph as ic loop
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of in degree edges attached to item: " + l_graph.in_degree.out)
 				print ("%NNumber of out degree edges attached to item: " + l_graph.out_degree.out)
-				l_bfs.forth
 			end
 			io.put_new_line
 
@@ -298,17 +281,12 @@ feature -- Test routines
 
 				-- DFS walker
 			print ("%NDFS walker")
-			create l_dfs.make (l_graph)
-			from
-				l_dfs.start
-			until
-				l_dfs.after
+			l_graph.iterate_depth_first
+			across l_graph as ic
 			loop
-				print ("%NCurrent item: " + l_dfs.item)
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of in degree edges attached to item: " + l_graph.in_degree.out)
 				print ("%NNumber of out degree edges attached to item: " + l_graph.out_degree.out)
-
-				l_dfs.forth
 			end
 			print ("%N=============================%N")
 
@@ -319,12 +297,9 @@ feature -- Test routines
 			end
 		end
 
-
 	test_build_undirected_graph_string_with_labels_integer
 		local
 			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, INTEGER_REF]
-			l_bfs: BFS_WALKER [STRING, INTEGER_REF]
-			l_dfs: DFS_WALKER [STRING, INTEGER_REF]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -377,15 +352,10 @@ feature -- Test routines
 
 				-- BFS walker
 			print ("%NBFS walker")
-			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
-			loop
-				print ("%NCurrent item: " + l_bfs.item)
+			l_graph.iterate_breadth_first
+			across l_graph as  ic loop
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_bfs.forth
 			end
 			io.put_new_line
 
@@ -396,15 +366,11 @@ feature -- Test routines
 
 				-- DFS walker
 			print ("%NDFS walker")
-			create l_dfs.make (l_graph)
-			from
-				l_dfs.start
-			until
-				l_dfs.after
+			l_graph.iterate_depth_first
+			across l_graph as ic
 			loop
-				print ("%NCurrent item: " + l_dfs.item)
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_dfs.forth
 			end
 			print ("%N=============================%N")
 		end
@@ -412,8 +378,7 @@ feature -- Test routines
 	test_build_undirected_graph_string
 		local
 			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, NONE]
-			l_bfs: BFS_WALKER [STRING, NONE]
-			l_dfs: DFS_WALKER [STRING, NONE]
+			it2: GRAPH_ITERATION_CURSOR [STRING, NONE]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -430,6 +395,21 @@ feature -- Test routines
 			l_graph.put_unlabeled_edge ("a", "c")
 			l_graph.put_unlabeled_edge ("b", "c")
 			l_graph.put_unlabeled_edge ("c", "d")
+
+			print ("%NIterator DFS%N")
+			l_graph.search ("a")
+			across l_graph as ic loop
+				print (ic.item)
+			end
+			check Expected_item_a: l_graph.item.is_equal ("a") end
+
+			print ("%NIterator BFS%N")
+			l_graph.iterate_breadth_first
+			across l_graph as ic loop
+				print (ic.item)
+			end
+			check Expected_item_a: l_graph.item.is_equal ("a") end
+			io.put_new_line
 
 			check
 				has_cycles: l_graph.has_cycles
@@ -466,15 +446,11 @@ feature -- Test routines
 
 				-- BFS walker
 			print ("%NBFS walker")
-			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
-			loop
-				print ("%NCurrent item: " + l_bfs.item)
+			l_graph.search ("a")
+			l_graph.iterate_breadth_first
+			across l_graph as ic  loop
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_bfs.forth
 			end
 			io.put_new_line
 
@@ -484,19 +460,112 @@ feature -- Test routines
 			end
 
 				-- DFS walker
-			print ("%NDFS walker")
-			create l_dfs.make (l_graph)
-			from
-				l_dfs.start
-			until
-				l_dfs.after
-			loop
-				print ("%NCurrent item: " + l_dfs.item)
+				-- Iterator DFS walker
+			print ("%NDFS Iterator")
+			l_graph.iterate_depth_first
+			across l_graph as ic loop
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_dfs.forth
 			end
 			print ("%N=============================")
+
 		end
 
+
+	test_dfs
+		local
+			l_graph: LINKED_UNDIRECTED_GRAPH [INTEGER, NONE]
+		do
+				--  (8) -- (0) -- (1) -- (7)
+				--   |      |             |
+				--  (4) -- (3) ----------(2) -- (5)---(6)
+			create l_graph.make_simple_graph
+
+				-- Add nodes
+			l_graph.put_node (0)
+			l_graph.put_node (1)
+			l_graph.put_node (2)
+			l_graph.put_node (3)
+			l_graph.put_node (4)
+			l_graph.put_node (5)
+			l_graph.put_node (6)
+			l_graph.put_node (7)
+			l_graph.put_node (8)
+
+				-- Add edges
+			l_graph.put_unlabeled_edge (0, 1)
+			l_graph.put_unlabeled_edge (0, 3)
+			l_graph.put_unlabeled_edge (0, 8)
+			l_graph.put_unlabeled_edge (1, 7)
+			l_graph.put_unlabeled_edge (3, 2)
+			l_graph.put_unlabeled_edge (3, 4)
+			l_graph.put_unlabeled_edge (8, 4)
+			l_graph.put_unlabeled_edge (2, 5)
+			l_graph.put_unlabeled_edge (2, 7)
+			l_graph.put_unlabeled_edge (5, 6)
+
+				-- Start at node 0
+			l_graph.search (0)
+
+				-- DFS by default
+			across l_graph as ic loop
+				print (ic.item)
+			end
+
+		end
+
+
+	test_bfs
+		local
+			l_graph: LINKED_UNDIRECTED_GRAPH [INTEGER, NONE]
+		do
+				--  (8) -- (0) -- (1) -- (7)
+				--   |      |             |
+				--  (4) -- (3) ----------(2) -- (5)---(6)
+			create l_graph.make_simple_graph
+
+				-- Add nodes
+			l_graph.put_node (0)
+			l_graph.put_node (1)
+			l_graph.put_node (2)
+			l_graph.put_node (3)
+			l_graph.put_node (4)
+			l_graph.put_node (5)
+			l_graph.put_node (6)
+			l_graph.put_node (7)
+			l_graph.put_node (8)
+
+				-- Add edges
+			l_graph.put_unlabeled_edge (0, 1)
+			l_graph.put_unlabeled_edge (0, 3)
+			l_graph.put_unlabeled_edge (0, 8)
+			l_graph.put_unlabeled_edge (1, 7)
+			l_graph.put_unlabeled_edge (3, 2)
+			l_graph.put_unlabeled_edge (3, 4)
+			l_graph.put_unlabeled_edge (8, 4)
+			l_graph.put_unlabeled_edge (2, 5)
+			l_graph.put_unlabeled_edge (2, 7)
+			l_graph.put_unlabeled_edge (5, 6)
+
+				-- Start at node 0
+			l_graph.search (0)
+
+			l_graph.iterate_breadth_first
+			across l_graph as ic loop
+				print (ic.item)
+			end
+
+		end
+
+note
+	copyright: "Copyright (c) 1984-2020, Eiffel Software and others"
+	license: "Eiffel Forum License v2 (see http://www.eiffel.com/licensing/forum.txt)"
+	source: "[
+			Eiffel Software
+			5949 Hollister Ave., Goleta, CA 93117 USA
+			Telephone 805-685-1006, Fax 805-685-6869
+			Website http://www.eiffel.com
+			Customer support http://support.eiffel.com
+		]"
 end
 
