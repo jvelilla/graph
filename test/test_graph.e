@@ -3,8 +3,8 @@ note
 		Eiffel tests that can be executed by testing tool.
 	]"
 	author: "EiffelStudio test wizard"
-	date: "$Date$"
-	revision: "$Revision$"
+	date: "$Date: 2020-11-12 16:15:16 -0300 (Thu, 12 Nov 2020) $"
+	revision: "$Revision: 104864 $"
 	testing: "type/manual"
 
 class
@@ -43,8 +43,6 @@ feature -- Test routines
 	test_build_undirected_graph_string_with_labels
 		local
 			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, STRING]
-			l_bfs: BFS_WALKER [STRING, STRING]
-			l_dfs: DFS_WALKER [STRING, STRING]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -101,17 +99,9 @@ feature -- Test routines
 
 				-- BFS walker
 			print ("%NBFS walker")
-			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
+			l_graph.iterate_breadth_first
+			across l_graph as ic
 			loop
-				print ("%NCurrent item: " + l_bfs.item)
-				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_bfs.forth
-			end
-			across l_bfs as ic loop
 				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
 			end
@@ -124,15 +114,11 @@ feature -- Test routines
 
 				-- DFS walker
 			print ("%NDFS walker")
-			create l_dfs.make (l_graph)
-			from
-				l_dfs.start
-			until
-				l_dfs.after
+			l_graph.iterate_depth_first
+			across l_graph as ic
 			loop
-				print ("%NCurrent item: " + l_dfs.item)
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_dfs.forth
 			end
 			print ("%N=============================%N")
 
@@ -146,8 +132,6 @@ feature -- Test routines
 	test_build_undirected_matrix_graph_string_with_labels
 		local
 			l_graph: ADJACENCY_MATRIX_UNDIRECTED_GRAPH [STRING, STRING]
-			l_bfs: BFS_WALKER [STRING, STRING]
-			l_dfs: DFS_WALKER [STRING, STRING]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -199,15 +183,10 @@ feature -- Test routines
 
 				-- BFS walker
 			print ("%NBFS walker")
-			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
-			loop
-				print ("%NCurrent item: " + l_bfs.item)
+			l_graph.iterate_breadth_first
+			across l_graph as ic loop
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_bfs.forth
 			end
 			io.put_new_line
 
@@ -218,15 +197,11 @@ feature -- Test routines
 
 				-- DFS walker
 			print ("%NDFS walker")
-			create l_dfs.make (l_graph)
-			from
-				l_dfs.start
-			until
-				l_dfs.after
+			l_graph.iterate_depth_first
+			across l_graph as ic
 			loop
-				print ("%NCurrent item: " + l_dfs.item)
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_dfs.forth
 			end
 			print ("%N=============================%N")
 
@@ -240,8 +215,6 @@ feature -- Test routines
 	test_build_matrix_graph_string_with_labels
 		local
 			l_graph: ADJACENCY_MATRIX_GRAPH [STRING, STRING]
-			l_bfs: BFS_WALKER [STRING, STRING]
-			l_dfs: DFS_WALKER [STRING, STRING]
 		do
 				-- Create the graph
 			create l_graph.make_symmetric_graph
@@ -293,16 +266,11 @@ feature -- Test routines
 
 				-- BFS walker
 			print ("%NBFS walker")
-			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
-			loop
-				print ("%NCurrent item: " + l_bfs.item)
+			l_graph.iterate_breadth_first
+			across l_graph as ic loop
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of in degree edges attached to item: " + l_graph.in_degree.out)
 				print ("%NNumber of out degree edges attached to item: " + l_graph.out_degree.out)
-				l_bfs.forth
 			end
 			io.put_new_line
 
@@ -313,17 +281,12 @@ feature -- Test routines
 
 				-- DFS walker
 			print ("%NDFS walker")
-			create l_dfs.make (l_graph)
-			from
-				l_dfs.start
-			until
-				l_dfs.after
+			l_graph.iterate_depth_first
+			across l_graph as ic
 			loop
-				print ("%NCurrent item: " + l_dfs.item)
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of in degree edges attached to item: " + l_graph.in_degree.out)
 				print ("%NNumber of out degree edges attached to item: " + l_graph.out_degree.out)
-
-				l_dfs.forth
 			end
 			print ("%N=============================%N")
 
@@ -337,8 +300,6 @@ feature -- Test routines
 	test_build_undirected_graph_string_with_labels_integer
 		local
 			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, INTEGER_REF]
-			l_bfs: BFS_WALKER [STRING, INTEGER_REF]
-			l_dfs: DFS_WALKER [STRING, INTEGER_REF]
 		do
 				-- Create the graph
 			create l_graph.make_simple_graph
@@ -391,15 +352,10 @@ feature -- Test routines
 
 				-- BFS walker
 			print ("%NBFS walker")
-			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
-			loop
-				print ("%NCurrent item: " + l_bfs.item)
+			l_graph.iterate_breadth_first
+			across l_graph as  ic loop
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_bfs.forth
 			end
 			io.put_new_line
 
@@ -410,15 +366,11 @@ feature -- Test routines
 
 				-- DFS walker
 			print ("%NDFS walker")
-			create l_dfs.make (l_graph)
-			from
-				l_dfs.start
-			until
-				l_dfs.after
+			l_graph.iterate_depth_first
+			across l_graph as ic
 			loop
-				print ("%NCurrent item: " + l_dfs.item)
+				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_dfs.forth
 			end
 			print ("%N=============================%N")
 		end
@@ -426,8 +378,6 @@ feature -- Test routines
 	test_build_undirected_graph_string
 		local
 			l_graph: LINKED_UNDIRECTED_GRAPH [STRING, NONE]
-			l_bfs: BFS_WALKER [STRING, NONE]
-			l_dfs: DFS_WALKER [STRING, NONE]
 			it2: GRAPH_ITERATION_CURSOR [STRING, NONE]
 		do
 				-- Create the graph
@@ -496,27 +446,13 @@ feature -- Test routines
 
 				-- BFS walker
 			print ("%NBFS walker")
-			create l_bfs.make (l_graph)
-			from
-				l_bfs.start
-			until
-				l_bfs.after
-			loop
-				print ("%NCurrent item: " + l_bfs.item)
-				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_bfs.forth
-			end
-			io.put_new_line
-
-			print ("%NBFS Iterator")
-			create l_bfs.make (l_graph)
-
 			l_graph.search ("a")
 			l_graph.iterate_breadth_first
-			across l_graph as ic loop
+			across l_graph as ic  loop
 				print ("%NCurrent item: " + ic.item)
 				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
 			end
+			io.put_new_line
 
 			l_graph.search ("a")
 			check
@@ -524,18 +460,6 @@ feature -- Test routines
 			end
 
 				-- DFS walker
-			print ("%NDFS walker")
-			create l_dfs.make (l_graph)
-			from
-				l_dfs.start
-			until
-				l_dfs.after
-			loop
-				print ("%NCurrent item: " + l_dfs.item)
-				print ("%NNumber of edges attached to item: " + l_graph.degree.out)
-				l_dfs.forth
-			end
-
 				-- Iterator DFS walker
 			print ("%NDFS Iterator")
 			l_graph.iterate_depth_first
@@ -633,5 +557,15 @@ feature -- Test routines
 
 		end
 
+note
+	copyright: "Copyright (c) 1984-2020, Eiffel Software and others"
+	license: "Eiffel Forum License v2 (see http://www.eiffel.com/licensing/forum.txt)"
+	source: "[
+			Eiffel Software
+			5949 Hollister Ave., Goleta, CA 93117 USA
+			Telephone 805-685-1006, Fax 805-685-6869
+			Website http://www.eiffel.com
+			Customer support http://support.eiffel.com
+		]"
 end
 
